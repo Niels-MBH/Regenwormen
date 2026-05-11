@@ -850,6 +850,38 @@ function renderGameOver(){
   });
   const btn=document.getElementById('btnReplay');
   if(btn)applyDwell(btn,()=>{if(!btn.disabled)btn.click()});
+
+  <!-- Laad WebGazer in via CDN -->
+<script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
+
+<!-- Initialiseer WebGazer en koppel het aan de Dwell-timer -->
+<script>
+  window.addEventListener('load', function() {
+    let lastElement = null;
+
+    webgazer.setGazeListener(function(data, clock) {
+      if (data == null) return;
+
+      // Bereken naar welk HTML-element de gebruiker kijkt (x, y coördinaten)
+      let currentElement = document.elementFromPoint(data.x, data.y);
+
+      // Als we naar een nieuw element kijken, simuleer dan de mouse-events
+      // Dit zorgt ervoor dat jouw 'applyDwell' functie geactiveerd wordt!
+      if (currentElement !== lastElement) {
+        if (lastElement) {
+          lastElement.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+        }
+        if (currentElement) {
+          currentElement.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+        }
+        lastElement = currentElement;
+      }
+    }).begin();
+
+    // Toon de camera en rode stip voor kalibratie (kun je later op false zetten)
+    webgazer.showVideoPreview(true).showPredictionPoints(true);
+  });
+</script>
 }
 </script>
 </body>
