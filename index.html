@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
+ <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🐛 Regenwormen</title>
@@ -166,6 +168,9 @@ body{
     <button class="big-btn btn-green" id="btnStart" onclick="startGame()">
       🐛 Spel starten!<div class="dwell-ring"></div>
     </button>
+    <button class="big-btn btn-blue" onclick="startTracking()">
+  👁️ Eye tracking aan
+</button>
   </div>
 
   <div class="dwell-block">
@@ -278,7 +283,23 @@ function setSpeed(btn) {
 
 function applyDwell(el, cb) {
   el.addEventListener('mouseenter', () => {
-    if (!dwellMode || el.disabled) return;
+   if (!dwellMode || el.disabled) return;
+
+// 👁️ EYE TRACKING CHECK (koppeling met je ogen)
+if (eyeEnabled && window.EyeTracker) {
+  const rect = el.getBoundingClientRect();
+
+  const ex = window.EyeTracker.x * window.innerWidth;
+  const ey = window.EyeTracker.y * window.innerHeight;
+
+  const inside =
+    ex > rect.left &&
+    ex < rect.right &&
+    ey > rect.top &&
+    ey < rect.bottom;
+
+  if (!inside) return;
+}
     const ring  = el.querySelector('.dwell-ring');
     const start = Date.now();
     const id    = setInterval(() => {
@@ -745,238 +766,65 @@ function renderGameOver() {
   if (btn) applyDwell(btn, () => { if (!btn.disabled) btn.click(); });
 }
 </script>
+  let camera;
+let faceMesh;
+let eyeEnabled = false;
 
-  <!DOCTYPE html>
-<html lang="nl">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Eye Tracking Clean</title>
+function startTracking() {
+  eyeEnabled = true;
 
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  const video = document.createElement("video");
+  video.autoplay = true;
+  video.playsInline = true;
+  video.style.display = "none";
+  document.body.appendChild(video);
 
-<style>
-body{
-  margin:0;
-  overflow:hidden;
-  background:#050b16;
-  color:white;
-  font-family:Arial;
+  faceMesh = new FaceMesh({
+    locateFile: (f) =>
+      `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
+  });
+
+  faceMesh.setOptions({
+    maxNumFaces: 1,
+    refineLandmarks: true,
+    minDetectionConfidence: 0.5,
+    minTrackingConfidence: 0.5
+  });
+
+  faceMesh.onResults(onFaceResults);
+
+  camera = new Camera(video, {
+    onFrame: async () => {
+      await faceMesh.send({ image: video });
+    },
+    width: 640,
+    height: 480
+  });
+
+  camera.start();
 }
 
-video{
-  position:fixed;
-  left:20px;
-  bottom:20px;
-  width:280px;
-  border-radius:12px;
-  border:2px solid #16345e;
-}
-
-canvas{
-  position:fixed;
-  inset:0;
-  width:100vw;
-  height:100vh;
-  pointer-events:none;
-}
-
-#gazeCursor{
-  position:fixed;
-  width:30px;
-  height:30px;
-  border-radius:50%;
-  border:3px solid #00e5ff;
-  background:rgba(0,229,255,0.2);
-  transform:translate(-50%,-50%);
-}
-
-button{
-  margin:10px;
-  padding:10px 15px;
-  font-weight:bold;
-}
-
-.calDot{
-  position:fixed;
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  background:#222;
-  border:2px solid #666;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  cursor:pointer;
-  transform:translate(-50%,-50%);
-}
-
-.calDot.done{
-  border-color:lime;
-}
-</style>
-</head>
-
-<body>
-
-<button onclick="startTracking()">Start</button>
-<button onclick="startCalibration()">Calibrate</button>
-
-<div id="gazeCursor"></div>
-
-<video id="video" autoplay playsinline></video>
-<canvas id="canvas"></canvas>
-
-<script>
-
-const video = document.getElementById("video");
-const cursor = document.getElementById("gazeCursor");
-
-let camera;
-let calibration = [];
-let isCalibrating = false;
-let dots = [];
-let currentDot = 0;
-
-let smoothX = window.innerWidth/2;
-let smoothY = window.innerHeight/2;
-
-/* smoothing */
-function smooth(valX,valY){
-  smoothX = smoothX*0.8 + valX*0.2;
-  smoothY = smoothY*0.8 + valY*0.2;
-  return {x:smoothX,y:smoothY};
-}
-
-/* MediaPipe */
-const faceMesh = new FaceMesh({
-  locateFile: f =>
-    `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
-});
-
-faceMesh.setOptions({
-  maxNumFaces:1,
-  refineLandmarks:true,
-  minDetectionConfidence:0.5,
-  minTrackingConfidence:0.5
-});
-
-/* tracking */
-faceMesh.onResults(results => {
-
-  if(!results.multiFaceLandmarks?.length) return;
+  function onFaceResults(results) {
+  if (!results.multiFaceLandmarks?.length) return;
 
   const face = results.multiFaceLandmarks[0];
 
   const irisL = face[468];
   const irisR = face[473];
 
-  const leftEye = face[33];
-  const rightEye = face[263];
+  let x = 1 - (irisL.x + irisR.x) / 2;
+  let y = 1 - (irisL.y + irisR.y) / 2;
 
-let x = 1 - (irisL.x + irisR.x) / 2;
-let y = 1 - (irisL.y + irisR.y) / 2;
+  y = 1 - y;
 
-// FIX: alleen hier omdraaien (niet dubbel)
-y = 1 - y;
+  x = (x - 0.5) * 5 + 0.5;
+  y = (y - 0.5) * 12 + 0.5;
 
-// maak beweging sterker
-x = (x - 0.5) * 5.0 + 0.5;
-y = (y - 0.5) * 12.0 + 0.5;
+  x = Math.min(1, Math.max(0, x));
+  y = Math.min(1, Math.max(0, y));
 
-// voorkom dat hij buiten scherm gaat
-x = Math.min(1, Math.max(0, x));
-y = Math.min(1, Math.max(0, y));
-
-const pos = smooth(
-  x * window.innerWidth,
-  y * window.innerHeight
-);
-
-  cursor.style.left = pos.x + "px";
-  cursor.style.top = pos.y + "px";
-
-  window.EyeTracker = {
-    x: pos.x/window.innerWidth,
-    y: pos.y/window.innerHeight
-  };
-
-});
-
-/* camera */
-async function startTracking(){
-
-  camera = new Camera(video,{
-    onFrame: async ()=>{
-      await faceMesh.send({image:video});
-    },
-    width:640,
-    height:480
-  });
-
-  camera.start();
+  window.EyeTracker = { x, y };
 }
-
-/* calibration points */
-function points(){
-  return [
-    [0.1,0.1],[0.5,0.1],[0.9,0.1],
-    [0.1,0.5],[0.5,0.5],[0.9,0.5],
-    [0.1,0.9],[0.5,0.9],[0.9,0.9]
-  ];
-}
-
-function startCalibration(){
-
-  calibration = [];
-  currentDot = 0;
-
-  dots.forEach(d=>d.remove());
-  dots = [];
-
-  const p = points();
-
-  p.forEach((pos,i)=>{
-
-    const dot = document.createElement("div");
-    dot.className = "calDot";
-    dot.innerText = i+1;
-
-    dot.style.left = pos[0]*window.innerWidth+"px";
-    dot.style.top = pos[1]*window.innerHeight+"px";
-
-    dot.onclick = ()=>{
-
-      calibration.push({
-        eye: window.EyeTracker,
-        screen: pos
-      });
-
-      dot.classList.add("done");
-
-      currentDot++;
-
-    };
-
-    document.body.appendChild(dot);
-    dots.push(dot);
-
-  });
-
-}
-
-window.onresize = ()=>{
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-};
-
-</script>
-
-</body>
-</html>
- 
-
 </body>
 </html>
  
