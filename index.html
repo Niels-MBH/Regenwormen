@@ -766,8 +766,11 @@ function renderGameOver() {
   const btn = document.getElementById('btnReplay');
   if (btn) applyDwell(btn, () => { if (!btn.disabled) btn.click(); });
 }
-</script>
-  let camera;
+ // ═══════════════════════════════════════
+// EYE TRACKING (GOED GEPLAATST)
+// ═══════════════════════════════════════
+
+let camera;
 let faceMesh;
 let eyeEnabled = false;
 
@@ -805,11 +808,10 @@ function startTracking() {
   camera.start();
 }
 
-  function onFaceResults(results) {
+function onFaceResults(results) {
   if (!results.multiFaceLandmarks?.length) return;
 
   const face = results.multiFaceLandmarks[0];
-
   const irisL = face[468];
   const irisR = face[473];
 
@@ -826,6 +828,7 @@ function startTracking() {
 
   window.EyeTracker = { x, y };
 }
+</script>
 </body>
 </html>
  
