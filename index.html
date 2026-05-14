@@ -1173,7 +1173,8 @@ function buildNames(){
 
 function startGame(){
 
-  players =
+  showScreen("game");
+players =
     [...document.querySelectorAll('.name-input')]
       .map((inp, i) => ({
         name: inp.value.trim() || defNames[i],
