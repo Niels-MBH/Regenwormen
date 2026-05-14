@@ -12,6 +12,12 @@
 
 <style>
 
+  html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
 /* ── Fonts ── */
 @font-face{
   font-family:'Fredoka One';
@@ -55,6 +61,8 @@ body{
 /* screens */
 .screen{
   display:none;
+  height:100vh;
+  width:100vw;
 }
 
 .screen.active{
@@ -317,12 +325,15 @@ body{
 
 /* game */
 #game{
-  max-width:940px;
-  margin:0 auto;
+  height:100vh;
+  width:100vw;
+  max-width:none;
+  margin:0;
   padding:.75rem;
   display:flex;
   flex-direction:column;
   gap:.75rem;
+  overflow:hidden;
 }
 
 /* header */
@@ -531,6 +542,8 @@ body{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
   gap:8px;
+  overflow-y:auto;
+  max-height:20vh;
 }
 
 .p-card{
