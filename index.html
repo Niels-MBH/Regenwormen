@@ -1,156 +1,664 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
- <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
- <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🐛 Regenwormen</title>
-<style>
-/* ── Fonts (direct van Google CDN, werkt offline niet) ── */
-@font-face { font-family:'Fredoka One'; font-weight:400; font-display:swap;
-  src:url(https://fonts.gstatic.com/s/fredokaone/v15/k3kUo8kEI-tA1RRcTZGmTlHGCac.woff2) format('woff2'); }
-@font-face { font-family:'Nunito'; font-weight:400; font-display:swap;
-  src:url(https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofINeaB.woff2) format('woff2'); }
-@font-face { font-family:'Nunito'; font-weight:700; font-display:swap;
-  src:url(https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIO-aBXso.woff2) format('woff2'); }
-@font-face { font-family:'Nunito'; font-weight:800; font-display:swap;
-  src:url(https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofINeaB.woff2) format('woff2'); }
 
-/* ── Reset ── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+<title>🐛 Regenwormen</title>
+
+<!-- MediaPipe -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+<style>
+
+/* ── Fonts ── */
+@font-face{
+  font-family:'Fredoka One';
+  font-weight:400;
+  font-display:swap;
+  src:url(https://fonts.gstatic.com/s/fredokaone/v15/k3kUo8kEI-tA1RRcTZGmTlHGCac.woff2) format('woff2');
+}
+
+@font-face{
+  font-family:'Nunito';
+  font-weight:400;
+  font-display:swap;
+  src:url(https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofINeaB.woff2) format('woff2');
+}
+
+@font-face{
+  font-family:'Nunito';
+  font-weight:700;
+  font-display:swap;
+  src:url(https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIO-aBXso.woff2) format('woff2');
+}
+
+/* RESET */
+*,*::before,*::after{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
 body{
   font-family:'Nunito',sans-serif;
-  background:#2a5c38;min-height:100vh;color:#2c1810;
+  background:#2a5c38;
+  min-height:100vh;
+  color:#2c1810;
+
   background-image:
     radial-gradient(ellipse at top left,rgba(255,255,255,.06) 0%,transparent 55%),
     radial-gradient(ellipse at bottom right,rgba(0,0,0,.18) 0%,transparent 55%);
 }
 
-/* ── Screens ── */
-.screen{display:none}.screen.active{display:block}
+/* screens */
+.screen{
+  display:none;
+}
 
-/* ════════ SETUP ════════ */
-#setup{max-width:560px;margin:0 auto;padding:2rem 1rem;text-align:center}
-.logo-worm{font-size:3rem;line-height:1}
-.logo{font-family:'Fredoka One',sans-serif;font-size:3.8rem;color:#f5b731;text-shadow:3px 4px 0 #c8901a;line-height:1;margin-bottom:.2rem}
-.logo-sub{color:rgba(255,255,255,.65);font-size:1rem;font-weight:700;letter-spacing:.05em;margin-bottom:1.75rem}
-.card{background:#fdf6e3;border-radius:24px;padding:1.75rem;box-shadow:0 8px 32px rgba(0,0,0,.3)}
-.field-label{display:block;text-align:left;font-weight:800;font-size:.82rem;color:#7a4a1e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.55rem}
-.count-row{display:flex;gap:8px;justify-content:center;margin-bottom:1.4rem}
-.count-btn{width:52px;height:52px;border-radius:50%;border:3px solid #ddd;background:#fff;font-family:'Fredoka One',sans-serif;font-size:1.4rem;color:#7a4a1e;cursor:pointer;transition:all .15s}
-.count-btn.active{background:#2ecc71;border-color:#1a9e52;color:#fff;transform:scale(1.1);box-shadow:0 3px 0 #1a9e52}
-.name-inputs{display:grid;gap:8px;margin-bottom:1.4rem}
-.name-input{width:100%;padding:12px 14px;border-radius:12px;border:2px solid #e0d8c8;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;color:#2c1810;background:#fff;outline:none;transition:border-color .2s}
-.name-input:focus{border-color:#2ecc71}
+.screen.active{
+  display:block;
+}
 
-/* ── Big button ── */
-.big-btn{width:100%;padding:18px 20px;border-radius:18px;border:none;font-family:'Fredoka One',sans-serif;font-size:1.35rem;cursor:pointer;transition:transform .1s,box-shadow .1s,opacity .2s;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:10px}
-.big-btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none!important}
-.big-btn:not(:disabled):hover{transform:translateY(-2px)}
-.big-btn:not(:disabled):active{transform:scale(.97)}
-.btn-green{background:#2ecc71;color:#fff;box-shadow:0 4px 0 #1a9e52}
-.btn-blue {background:#3498db;color:#fff;box-shadow:0 4px 0 #1a6ea8}
-.btn-orange{background:#e67e22;color:#fff;box-shadow:0 4px 0 #b85a12}
+/* setup */
+#setup{
+  max-width:560px;
+  margin:0 auto;
+  padding:2rem 1rem;
+  text-align:center;
+}
 
-/* ── Dwell ring (inside every .big-btn, .die, .msg-ok) ── */
-.dwell-ring{position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:conic-gradient(rgba(255,255,255,.55) 0deg,transparent 0deg)}
+.logo-worm{
+  font-size:3rem;
+  line-height:1;
+}
 
-/* ── Dwell block in setup ── */
-.dwell-block{margin-top:1.25rem;background:rgba(0,0,0,.25);border-radius:16px;padding:1rem 1.25rem;text-align:left}
-.dwell-header{display:flex;align-items:center;gap:10px;font-size:1rem;font-weight:700;color:#fff;margin-bottom:.3rem}
-.dwell-explain{font-size:.82rem;color:rgba(255,255,255,.65);font-weight:700;margin-bottom:.75rem;line-height:1.45}
-.toggle{width:50px;height:28px;background:#666;border-radius:14px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
-.toggle.on{background:#2ecc71}
-.toggle::after{content:'';position:absolute;width:22px;height:22px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.toggle.on::after{left:25px}
-.speed-row{display:none;gap:8px;flex-wrap:wrap;margin-top:.6rem}
-.speed-row.visible{display:flex}
-.speed-row label{color:rgba(255,255,255,.65);font-size:.82rem;font-weight:700;align-self:center}
-.speed-btn{padding:4px 12px;border-radius:20px;border:2px solid rgba(255,255,255,.3);background:transparent;color:rgba(255,255,255,.65);font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer}
-.speed-btn.active{background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.7)}
+.logo{
+  font-family:'Fredoka One',sans-serif;
+  font-size:3.8rem;
+  color:#f5b731;
+  text-shadow:3px 4px 0 #c8901a;
+  line-height:1;
+  margin-bottom:.2rem;
+}
 
-/* ════════ GAME SCREEN ════════ */
-#game{max-width:940px;margin:0 auto;padding:.75rem;display:flex;flex-direction:column;gap:.75rem}
+.logo-sub{
+  color:rgba(255,255,255,.65);
+  font-size:1rem;
+  font-weight:700;
+  letter-spacing:.05em;
+  margin-bottom:1.75rem;
+}
+
+.card{
+  background:#fdf6e3;
+  border-radius:24px;
+  padding:1.75rem;
+  box-shadow:0 8px 32px rgba(0,0,0,.3);
+}
+
+.field-label{
+  display:block;
+  text-align:left;
+  font-weight:800;
+  font-size:.82rem;
+  color:#7a4a1e;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  margin-bottom:.55rem;
+}
+
+.count-row{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  margin-bottom:1.4rem;
+}
+
+.count-btn{
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  border:3px solid #ddd;
+  background:#fff;
+  font-family:'Fredoka One',sans-serif;
+  font-size:1.4rem;
+  color:#7a4a1e;
+  cursor:pointer;
+  transition:all .15s;
+}
+
+.count-btn.active{
+  background:#2ecc71;
+  border-color:#1a9e52;
+  color:#fff;
+  transform:scale(1.1);
+  box-shadow:0 3px 0 #1a9e52;
+}
+
+.name-inputs{
+  display:grid;
+  gap:8px;
+  margin-bottom:1.4rem;
+}
+
+.name-input{
+  width:100%;
+  padding:12px 14px;
+  border-radius:12px;
+  border:2px solid #e0d8c8;
+  font-family:'Nunito',sans-serif;
+  font-size:1rem;
+  font-weight:700;
+  color:#2c1810;
+  background:#fff;
+  outline:none;
+}
+
+.name-input:focus{
+  border-color:#2ecc71;
+}
+
+/* buttons */
+.big-btn{
+  width:100%;
+  padding:18px 20px;
+  border-radius:18px;
+  border:none;
+  font-family:'Fredoka One',sans-serif;
+  font-size:1.35rem;
+  cursor:pointer;
+  transition:transform .1s,box-shadow .1s,opacity .2s;
+  position:relative;
+  overflow:hidden;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+}
+
+.big-btn:disabled{
+  opacity:.35;
+  cursor:not-allowed;
+}
+
+.btn-green{
+  background:#2ecc71;
+  color:#fff;
+  box-shadow:0 4px 0 #1a9e52;
+}
+
+.btn-blue{
+  background:#3498db;
+  color:#fff;
+  box-shadow:0 4px 0 #1a6ea8;
+}
+
+.btn-orange{
+  background:#e67e22;
+  color:#fff;
+  box-shadow:0 4px 0 #b85a12;
+}
+
+.big-btn:not(:disabled):hover{
+  transform:translateY(-2px);
+}
+
+.big-btn:not(:disabled):active{
+  transform:scale(.97);
+}
+
+/* dwell ring */
+.dwell-ring{
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  background:conic-gradient(rgba(255,255,255,.55) 0deg,transparent 0deg);
+}
+
+/* dwell */
+.dwell-block{
+  margin-top:1.25rem;
+  background:rgba(0,0,0,.25);
+  border-radius:16px;
+  padding:1rem 1.25rem;
+  text-align:left;
+}
+
+.dwell-header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:1rem;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:.3rem;
+}
+
+.dwell-explain{
+  font-size:.82rem;
+  color:rgba(255,255,255,.65);
+  font-weight:700;
+  margin-bottom:.75rem;
+  line-height:1.45;
+}
+
+.toggle{
+  width:50px;
+  height:28px;
+  background:#666;
+  border-radius:14px;
+  position:relative;
+  cursor:pointer;
+  transition:background .2s;
+  flex-shrink:0;
+}
+
+.toggle.on{
+  background:#2ecc71;
+}
+
+.toggle::after{
+  content:'';
+  position:absolute;
+  width:22px;
+  height:22px;
+  background:#fff;
+  border-radius:50%;
+  top:3px;
+  left:3px;
+  transition:left .2s;
+}
+
+.toggle.on::after{
+  left:25px;
+}
+
+.speed-row{
+  display:none;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:.6rem;
+}
+
+.speed-row.visible{
+  display:flex;
+}
+
+.speed-btn{
+  padding:4px 12px;
+  border-radius:20px;
+  border:2px solid rgba(255,255,255,.3);
+  background:transparent;
+  color:rgba(255,255,255,.65);
+  font-family:'Nunito',sans-serif;
+  font-size:.82rem;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.speed-btn.active{
+  background:rgba(255,255,255,.2);
+  color:#fff;
+  border-color:rgba(255,255,255,.7);
+}
+
+/* game */
+#game{
+  max-width:940px;
+  margin:0 auto;
+  padding:.75rem;
+  display:flex;
+  flex-direction:column;
+  gap:.75rem;
+}
 
 /* header */
-.g-header{background:rgba(0,0,0,.35);border-radius:18px;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.gh-label{font-size:.72rem;color:rgba(255,255,255,.6);font-weight:700}
-.gh-name{font-family:'Fredoka One',sans-serif;font-size:1.6rem;color:#fff;line-height:1.1}
-.gh-mid{text-align:center}
-.gh-score{font-family:'Fredoka One',sans-serif;font-size:2.6rem;color:#f5b731;line-height:1}
-.gh-right{text-align:right;font-family:'Fredoka One',sans-serif;font-size:1.2rem;color:#fff}
+.g-header{
+  background:rgba(0,0,0,.35);
+  border-radius:18px;
+  padding:12px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
 
-/* tile row */
-.g-section{background:rgba(0,0,0,.2);border-radius:16px;padding:12px 14px}
-.sec-label{font-size:.72rem;font-weight:800;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
-.tile-row{display:flex;flex-wrap:wrap;gap:6px;min-height:72px}
-.tile{width:52px;height:70px;border-radius:10px;background:#f5b731;box-shadow:0 3px 0 #c8901a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
-.tile-n{font-family:'Fredoka One',sans-serif;font-size:1.3rem;color:#2c1810;line-height:1}
-.tile-w{font-size:.8rem;color:#7a4a00;font-weight:800}
+.gh-label{
+  font-size:.72rem;
+  color:rgba(255,255,255,.6);
+  font-weight:700;
+}
 
-/* dice card */
-.dice-card{background:#fdf6e3;border-radius:20px;padding:16px;box-shadow:0 4px 20px rgba(0,0,0,.22)}
-.instruction{text-align:center;font-size:.9rem;font-weight:700;color:#7a4a1e;background:rgba(245,183,49,.2);border-radius:10px;padding:7px 12px;margin-bottom:12px;min-height:36px;display:flex;align-items:center;justify-content:center}
-.sec-label-dark{font-size:.72rem;font-weight:800;color:rgba(44,24,16,.45);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.gh-name{
+  font-family:'Fredoka One',sans-serif;
+  font-size:1.6rem;
+  color:#fff;
+}
 
-/* current roll */
-.dice-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:100px;align-items:center;margin-bottom:12px}
-.die{width:90px;height:90px;border-radius:18px;border:3px solid #e0d8c0;background:#fffde7;box-shadow:0 4px 0 #c8be9a;display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',sans-serif;font-size:2.3rem;color:#2c1810;cursor:pointer;transition:transform .12s,border-color .12s,background .12s,opacity .15s;position:relative;overflow:hidden;user-select:none}
-.die:not(.used):hover{transform:translateY(-5px);border-color:#3498db;background:#e8f4fc}
-.die.used{opacity:.25;cursor:default}
+.gh-mid{
+  text-align:center;
+}
 
-/* chosen area */
-.chosen-area{display:flex;flex-wrap:wrap;gap:8px;min-height:72px;align-items:center;background:rgba(46,204,113,.09);border:2px dashed rgba(46,204,113,.4);border-radius:14px;padding:8px;margin-bottom:12px}
-.c-die{width:70px;height:70px;border-radius:12px;border:2px solid #2ecc71;background:#d4f5e3;display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',sans-serif;font-size:1.9rem;color:#2c1810}
+.gh-score{
+  font-family:'Fredoka One',sans-serif;
+  font-size:2.6rem;
+  color:#f5b731;
+}
 
-/* action row: only 2 buttons now */
-.action-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gh-right{
+  text-align:right;
+  font-family:'Fredoka One',sans-serif;
+  font-size:1.2rem;
+  color:#fff;
+}
+
+/* sections */
+.g-section{
+  background:rgba(0,0,0,.2);
+  border-radius:16px;
+  padding:12px 14px;
+}
+
+.sec-label{
+  font-size:.72rem;
+  font-weight:800;
+  color:rgba(255,255,255,.6);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  margin-bottom:8px;
+}
+
+.tile-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  min-height:72px;
+}
+
+.tile{
+  width:52px;
+  height:70px;
+  border-radius:10px;
+  background:#f5b731;
+  box-shadow:0 3px 0 #c8901a;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+.tile-n{
+  font-family:'Fredoka One',sans-serif;
+  font-size:1.3rem;
+}
+
+.tile-w{
+  font-size:.8rem;
+  font-weight:800;
+}
+
+/* dice */
+.dice-card{
+  background:#fdf6e3;
+  border-radius:20px;
+  padding:16px;
+}
+
+.instruction{
+  text-align:center;
+  font-size:.9rem;
+  font-weight:700;
+  color:#7a4a1e;
+  background:rgba(245,183,49,.2);
+  border-radius:10px;
+  padding:7px 12px;
+  margin-bottom:12px;
+}
+
+.sec-label-dark{
+  font-size:.72rem;
+  font-weight:800;
+  color:rgba(44,24,16,.45);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  margin-bottom:6px;
+}
+
+.dice-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:center;
+  min-height:100px;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.die{
+  width:90px;
+  height:90px;
+  border-radius:18px;
+  border:3px solid #e0d8c0;
+  background:#fffde7;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Fredoka One',sans-serif;
+  font-size:2.3rem;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  user-select:none;
+  transition:.12s;
+}
+
+.die:hover{
+  transform:translateY(-5px);
+}
+
+.die.used{
+  opacity:.25;
+  cursor:default;
+}
+
+.chosen-area{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  min-height:72px;
+  align-items:center;
+  background:rgba(46,204,113,.09);
+  border:2px dashed rgba(46,204,113,.4);
+  border-radius:14px;
+  padding:8px;
+  margin-bottom:12px;
+}
+
+.c-die{
+  width:70px;
+  height:70px;
+  border-radius:12px;
+  border:2px solid #2ecc71;
+  background:#d4f5e3;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Fredoka One',sans-serif;
+  font-size:1.9rem;
+}
+
+.action-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
 
 /* players */
-.players-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
-.p-card{background:rgba(0,0,0,.25);border-radius:16px;padding:12px;border:3px solid transparent;transition:border-color .2s,background .2s}
-.p-card.cur{border-color:#f5b731;background:rgba(245,183,49,.12)}
-.p-name{font-family:'Fredoka One',sans-serif;color:#fff;font-size:1rem;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.p-worms{font-family:'Fredoka One',sans-serif;color:#f5b731;font-size:1.1rem;margin-bottom:6px}
-.p-tile{width:46px;height:60px;border-radius:8px;background:#f5b731;box-shadow:0 3px 0 #c8901a;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.p-tile-n{font-family:'Fredoka One',sans-serif;font-size:1.1rem;color:#2c1810;line-height:1}
-.p-tile-w{font-size:.75rem;color:#7a4a00;font-weight:800}
-.p-empty{color:rgba(255,255,255,.28);font-size:.78rem;font-weight:700}
-.p-stack{color:rgba(255,255,255,.4);font-size:.72rem;font-weight:700;margin-top:3px}
+.players-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:8px;
+}
 
-/* ════════ OVERLAY ════════ */
-#overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;z-index:200}
-#overlay.show{display:flex}
-.msg-box{background:#fdf6e3;border-radius:26px;padding:2rem 2.5rem;text-align:center;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.msg-icon{font-size:3.8rem;line-height:1;margin-bottom:.4rem}
-.msg-title{font-family:'Fredoka One',sans-serif;font-size:2rem;color:#2c1810;margin-bottom:.3rem}
-.msg-text{font-size:.95rem;color:#666;font-weight:700;line-height:1.5;margin-bottom:1.4rem}
-.msg-ok{padding:14px 36px;border-radius:14px;border:none;font-family:'Fredoka One',sans-serif;font-size:1.25rem;background:#2ecc71;color:#fff;box-shadow:0 4px 0 #1a9e52;cursor:pointer;position:relative;overflow:hidden;transition:transform .1s}
-.msg-ok:hover{transform:translateY(-2px)}
+.p-card{
+  background:rgba(0,0,0,.25);
+  border-radius:16px;
+  padding:12px;
+  border:3px solid transparent;
+}
 
-/* ════════ GAME OVER ════════ */
-#gameover{max-width:560px;margin:0 auto;padding:2rem 1rem;text-align:center}
-.go-title{font-family:'Fredoka One',sans-serif;font-size:3rem;color:#f5b731;text-shadow:2px 3px 0 #c8901a;margin-bottom:1.5rem}
-.ranking{display:grid;gap:10px;margin-bottom:1.5rem}
-.rank-row{background:#fdf6e3;border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 16px rgba(0,0,0,.2)}
-.rank-row.first{background:#f5b731;box-shadow:0 4px 20px rgba(0,0,0,.3)}
-.rank-pos{font-family:'Fredoka One',sans-serif;font-size:1.6rem;width:40px;color:#7a4a1e}
-.rank-row.first .rank-pos{color:#fff}
-.rank-name{font-weight:800;font-size:1.1rem;flex:1;text-align:left}
-.rank-worms{font-family:'Fredoka One',sans-serif;font-size:1.2rem;color:#e67e22}
-.rank-row.first .rank-worms{color:#fff}
+.p-card.cur{
+  border-color:#f5b731;
+}
 
-/* ════════ Animations ════════ */
-@keyframes rollAnim{0%{transform:rotate(0) scale(1)}20%{transform:rotate(-14deg) scale(1.12)}50%{transform:rotate(10deg) scale(1.08)}80%{transform:rotate(-5deg) scale(1.1)}100%{transform:rotate(0) scale(1)}}
-.die.rolling{animation:rollAnim .45s ease}
-@keyframes popIn{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
-.pop-in{animation:popIn .28s ease forwards}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.fade-up{animation:fadeUp .3s ease forwards}
+.p-name{
+  font-family:'Fredoka One',sans-serif;
+  color:#fff;
+  margin-bottom:3px;
+}
 
- /* EYE CURSOR */
+.p-worms{
+  font-family:'Fredoka One',sans-serif;
+  color:#f5b731;
+  margin-bottom:6px;
+}
+
+.p-tile{
+  width:46px;
+  height:60px;
+  border-radius:8px;
+  background:#f5b731;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+.p-empty{
+  color:rgba(255,255,255,.28);
+  font-size:.78rem;
+  font-weight:700;
+}
+
+.p-stack{
+  color:rgba(255,255,255,.4);
+  font-size:.72rem;
+  font-weight:700;
+  margin-top:3px;
+}
+
+/* overlay */
+#overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.72);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:200;
+}
+
+#overlay.show{
+  display:flex;
+}
+
+.msg-box{
+  background:#fdf6e3;
+  border-radius:26px;
+  padding:2rem 2.5rem;
+  text-align:center;
+  max-width:380px;
+  width:90%;
+}
+
+.msg-icon{
+  font-size:3.8rem;
+}
+
+.msg-title{
+  font-family:'Fredoka One',sans-serif;
+  font-size:2rem;
+  margin-bottom:.3rem;
+}
+
+.msg-text{
+  font-size:.95rem;
+  color:#666;
+  font-weight:700;
+  line-height:1.5;
+  margin-bottom:1.4rem;
+}
+
+.msg-ok{
+  padding:14px 36px;
+  border-radius:14px;
+  border:none;
+  font-family:'Fredoka One',sans-serif;
+  font-size:1.25rem;
+  background:#2ecc71;
+  color:#fff;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+}
+
+/* game over */
+#gameover{
+  max-width:560px;
+  margin:0 auto;
+  padding:2rem 1rem;
+  text-align:center;
+}
+
+.go-title{
+  font-family:'Fredoka One',sans-serif;
+  font-size:3rem;
+  color:#f5b731;
+  margin-bottom:1.5rem;
+}
+
+.ranking{
+  display:grid;
+  gap:10px;
+  margin-bottom:1.5rem;
+}
+
+.rank-row{
+  background:#fdf6e3;
+  border-radius:16px;
+  padding:14px 18px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.rank-row.first{
+  background:#f5b731;
+}
+
+.rank-pos{
+  font-family:'Fredoka One',sans-serif;
+  font-size:1.6rem;
+  width:40px;
+}
+
+.rank-name{
+  font-weight:800;
+  font-size:1.1rem;
+  flex:1;
+  text-align:left;
+}
+
+.rank-worms{
+  font-family:'Fredoka One',sans-serif;
+  font-size:1.2rem;
+}
+
+/* eye cursor */
 #eyeCursor{
   position:fixed;
   width:24px;
@@ -162,19 +670,36 @@ body{
   pointer-events:none;
   transform:translate(-50%,-50%);
 }
+
+/* animaties */
+@keyframes rollAnim{
+  0%{transform:rotate(0) scale(1)}
+  20%{transform:rotate(-14deg) scale(1.12)}
+  50%{transform:rotate(10deg) scale(1.08)}
+  80%{transform:rotate(-5deg) scale(1.1)}
+  100%{transform:rotate(0) scale(1)}
+}
+
+.die.rolling{
+  animation:rollAnim .45s ease;
+}
+
 </style>
 </head>
+
 <body>
 
- <div id="eyeCursor"></div>
+<div id="eyeCursor"></div>
 
-<!-- ══════ SETUP ══════ -->
+<!-- SETUP -->
 <div id="setup" class="screen active">
+
   <div class="logo-worm">🐛</div>
   <div class="logo">Regenwormen</div>
   <div class="logo-sub">Scharrelen met dobbelstenen — 2 tot 7 spelers</div>
 
   <div class="card">
+
     <label class="field-label">Hoeveel spelers?</label>
     <div class="count-row" id="countRow"></div>
 
@@ -182,694 +707,953 @@ body{
     <div class="name-inputs" id="nameInputs"></div>
 
     <button class="big-btn btn-green" id="btnStart" onclick="startGame()">
-      🐛 Spel starten!<div class="dwell-ring"></div>
+      🐛 Spel starten!
+      <div class="dwell-ring"></div>
     </button>
+
+    <br>
+
     <button class="big-btn btn-blue" onclick="startTracking()">
-  👁️ Eye tracking aan
-</button>
+      👁️ Eye tracking aan
+      <div class="dwell-ring"></div>
+    </button>
+
   </div>
 
   <div class="dwell-block">
+
     <div class="dwell-header">
       <div class="toggle" id="dwellToggle" onclick="toggleDwell()"></div>
       Dwell-timer (voor oogbesturing)
     </div>
+
     <div class="dwell-explain">
-      Oogbesturingssoftware (bijv. Tobii) beweegt de muiscursor naar waar je kijkt.
-      De dwell-timer zorgt dan dat je <strong>kunt klikken</strong> door even naar een
-      knop te blijven kijken — zonder handen.
+      Oogbesturingssoftware beweegt de cursor.
+      De dwell-timer klikt automatisch als je lang genoeg kijkt.
     </div>
+
     <div class="speed-row" id="speedRow">
-      <label>Wachttijd:</label>
-      <button class="speed-btn" data-ms="2500" onclick="setSpeed(this)">Lang (2,5s)</button>
-      <button class="speed-btn active" data-ms="1500" onclick="setSpeed(this)">Normaal (1,5s)</button>
-      <button class="speed-btn" data-ms="800"  onclick="setSpeed(this)">Kort (0,8s)</button>
+
+      <button class="speed-btn" data-ms="2500" onclick="setSpeed(this)">
+        Lang (2,5s)
+      </button>
+
+      <button class="speed-btn active" data-ms="1500" onclick="setSpeed(this)">
+        Normaal (1,5s)
+      </button>
+
+      <button class="speed-btn" data-ms="800" onclick="setSpeed(this)">
+        Kort (0,8s)
+      </button>
+
     </div>
+
   </div>
+
 </div>
 
-<!-- ══════ GAME ══════ -->
+<!-- GAME -->
 <div id="game" class="screen">
 
   <div class="g-header">
+
     <div>
       <div class="gh-label">Aan de beurt</div>
       <div class="gh-name" id="hName">—</div>
     </div>
+
     <div class="gh-mid">
       <div class="gh-score" id="hScore">0</div>
       <div class="gh-label">Beurt totaal</div>
     </div>
+
     <div class="gh-right">
-      <div class="gh-label" style="text-align:right">Jouw wormen</div>
+      <div class="gh-label">Jouw wormen</div>
       <div id="hWorms">🐛 0</div>
     </div>
+
   </div>
 
   <div class="g-section">
+
     <div class="sec-label">Tegels op tafel</div>
     <div class="tile-row" id="tileRow"></div>
+
   </div>
 
   <div class="dice-card">
-    <div class="instruction" id="instruction">Druk op 🎲 Gooi! om te beginnen</div>
 
-    <div class="sec-label-dark">Gegooid — klik op een dobbelsteen om hem te kiezen</div>
+    <div class="instruction" id="instruction">
+      Druk op 🎲 Gooi! om te beginnen
+    </div>
+
+    <div class="sec-label-dark">
+      Gegooid — klik op een dobbelsteen
+    </div>
+
     <div class="dice-row" id="diceRow"></div>
 
-    <div class="sec-label-dark">Opzijgelegd ✅</div>
+    <div class="sec-label-dark">
+      Opzijgelegd
+    </div>
+
     <div class="chosen-area" id="chosenArea"></div>
 
     <div class="action-row">
-      <button class="big-btn btn-blue"   id="btnRoll" onclick="doRoll()">
-        🎲 Gooi!<div class="dwell-ring"></div>
+
+      <button class="big-btn btn-blue" id="btnRoll" onclick="doRoll()">
+        🎲 Gooi!
+        <div class="dwell-ring"></div>
       </button>
+
       <button class="big-btn btn-orange" id="btnStop" onclick="doStop()" disabled>
-        🛑 Stop beurt<div class="dwell-ring"></div>
+        🛑 Stop beurt
+        <div class="dwell-ring"></div>
       </button>
+
     </div>
+
   </div>
 
   <div class="players-grid" id="playersGrid"></div>
+
 </div>
 
-<!-- ══════ GAME OVER ══════ -->
+<!-- GAME OVER -->
 <div id="gameover" class="screen">
+
   <div class="go-title">🏆 Einde spel!</div>
+
   <div class="ranking" id="rankingList"></div>
-  <button class="big-btn btn-green" id="btnReplay" onclick="resetGame()" style="max-width:300px;margin:0 auto">
-    🔄 Opnieuw spelen<div class="dwell-ring"></div>
+
+  <button class="big-btn btn-green" id="btnReplay" onclick="resetGame()">
+    🔄 Opnieuw spelen
+    <div class="dwell-ring"></div>
   </button>
+
 </div>
 
-<!-- ══════ OVERLAY ══════ -->
+<!-- OVERLAY -->
 <div id="overlay">
+
   <div class="msg-box">
-    <div class="msg-icon"  id="mIcon">😢</div>
+
+    <div class="msg-icon" id="mIcon">😢</div>
     <div class="msg-title" id="mTitle">—</div>
-    <div class="msg-text"  id="mText"></div>
+    <div class="msg-text" id="mText"></div>
+
     <button class="msg-ok" id="mBtn" onclick="closeOverlay()">
-      OK<div class="dwell-ring"></div>
+      OK
+      <div class="dwell-ring"></div>
     </button>
+
   </div>
+
 </div>
 
 <script>
-/* ══════════════════════════════════════════════
-   DWELL SYSTEM
-   Werkt samen met oogbesturingssoftware die de
-   muis beweegt. De dwell-timer klikt vanzelf als
-   de cursor lang genoeg op een element blijft.
-══════════════════════════════════════════════ */
-let dwellMode     = false;
-let dwellDuration = 1500;   // ms
-const dwellTimers = new Map();
 
-function toggleDwell() {
+/* =========================
+   DWELL
+========================= */
+
+let dwellMode = false;
+let dwellDuration = 1500;
+
+function toggleDwell(){
+
   dwellMode = !dwellMode;
-  document.getElementById('dwellToggle').classList.toggle('on', dwellMode);
-  document.getElementById('speedRow').classList.toggle('visible', dwellMode);
+
+  document.getElementById('dwellToggle')
+    .classList.toggle('on', dwellMode);
+
+  document.getElementById('speedRow')
+    .classList.toggle('visible', dwellMode);
 }
 
-function setSpeed(btn) {
-  document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+function setSpeed(btn){
+
+  document.querySelectorAll('.speed-btn')
+    .forEach(b => b.classList.remove('active'));
+
   btn.classList.add('active');
+
   dwellDuration = parseInt(btn.dataset.ms);
 }
-let eyeHoverElement = null;
-let eyeHoverStart = 0;
 
-function checkEyeHover() {
+function applyDwell(el, callback){
 
-  if (!eyeEnabled || !window.EyeTracker) return;
+  let timer = null;
 
-  const ex = window.EyeTracker.x;
-  const ey = window.EyeTracker.y;
+  el.addEventListener('mouseenter', () => {
 
-  const elements = document.querySelectorAll(
-    '.big-btn, .die, .msg-ok'
-  );
+    if(!dwellMode) return;
 
-  let hovered = null;
-
-  elements.forEach(el => {
-
-    if (el.disabled) return;
-
-    const rect = el.getBoundingClientRect();
-
-    const inside =
-      ex > rect.left &&
-      ex < rect.right &&
-      ey > rect.top &&
-      ey < rect.bottom;
-
-    if (inside) hovered = el;
-  });
-
-  if (hovered !== eyeHoverElement) {
-
-    eyeHoverElement = hovered;
-    eyeHoverStart = Date.now();
-
-    document.querySelectorAll('.dwell-ring')
-      .forEach(r => r.style.background = '');
-  }
-
-  if (!hovered) return;
-
-  const progress =
-    (Date.now() - eyeHoverStart) / dwellDuration;
-
-  const ring = hovered.querySelector('.dwell-ring');
-
-  if (ring) {
-
-    ring.style.background =
-      `conic-gradient(
-        rgba(255,255,255,.55)
-        ${progress * 360}deg,
-        transparent 0deg
-      )`;
-  }
-
-  if (progress >= 1) {
-
-    hovered.click();
-
-    eyeHoverElement = null;
-  }
-}
-
-}
-    const ring  = el.querySelector('.dwell-ring');
-    const start = Date.now();
-    const id    = setInterval(() => {
-      if (el.disabled) { clear(); return; }
-      const p   = Math.min((Date.now() - start) / dwellDuration, 1);
-      const deg = Math.round(p * 360);
-      if (ring) ring.style.background =
-        `conic-gradient(rgba(255,255,255,.55) ${deg}deg, transparent 0deg)`;
-      if (p >= 1) { clear(); cb(); }
-    }, 16);
-    dwellTimers.set(el, id);
-    function clear() {
-      clearInterval(id);
-      dwellTimers.delete(el);
-      if (ring) ring.style.background = '';
-    }
-  });
-  el.addEventListener('mouseleave', () => {
-    if (dwellTimers.has(el)) {
-      clearInterval(dwellTimers.get(el));
-      dwellTimers.delete(el);
-    }
     const ring = el.querySelector('.dwell-ring');
-    if (ring) ring.style.background = '';
+
+    const start = Date.now();
+
+    timer = setInterval(() => {
+
+      const progress =
+        Math.min((Date.now() - start) / dwellDuration, 1);
+
+      if(ring){
+        ring.style.background =
+          `conic-gradient(rgba(255,255,255,.55) ${progress * 360}deg, transparent 0deg)`;
+      }
+
+      if(progress >= 1){
+
+        clearInterval(timer);
+
+        if(ring){
+          ring.style.background = '';
+        }
+
+        callback();
+      }
+
+    }, 16);
+
+  });
+
+  el.addEventListener('mouseleave', () => {
+
+    clearInterval(timer);
+
+    const ring = el.querySelector('.dwell-ring');
+
+    if(ring){
+      ring.style.background = '';
+    }
+
   });
 }
 
-
-
-/* ══════════════════════════════════════════════
+/* =========================
    GAME STATE
-══════════════════════════════════════════════ */
-let players       = [];
+========================= */
+
+let players = [];
 let currentPlayer = 0;
-let tableTiles    = [];   // sorted, open tiles [21..36]
+let tableTiles = [];
 
-// Turn state — reset at the start of every turn
-let dice       = [];   // current unresolved roll (array of values)
-let chosenDice = [];   // all dice locked so far this turn (flat)
-let locked     = [];   // die-face VALUES that have been locked (unique)
+let dice = [];
+let chosenDice = [];
+let locked = [];
 
-/* ══════════════════════════════════════════════
-   SETUP SCREEN
-══════════════════════════════════════════════ */
-let numPlayers  = 2;
-const defNames  = ['Anna','Boris','Carmen','David','Eva','Floris','Gina'];
+/* =========================
+   SETUP
+========================= */
 
-(function buildSetup() {
+let numPlayers = 2;
+
+const defNames = [
+  'Anna','Boris','Carmen',
+  'David','Eva','Floris','Gina'
+];
+
+(function buildSetup(){
+
   const row = document.getElementById('countRow');
-  for (let n = 2; n <= 7; n++) {
+
+  for(let n = 2; n <= 7; n++){
+
     const b = document.createElement('button');
-    b.className  = 'count-btn' + (n === 2 ? ' active' : '');
+
+    b.className =
+      'count-btn' + (n === 2 ? ' active' : '');
+
     b.textContent = n;
+
     b.onclick = () => {
+
       numPlayers = n;
-      document.querySelectorAll('.count-btn').forEach(x => x.classList.remove('active'));
+
+      document.querySelectorAll('.count-btn')
+        .forEach(x => x.classList.remove('active'));
+
       b.classList.add('active');
+
       buildNames();
     };
+
     row.appendChild(b);
   }
+
   buildNames();
+
 })();
 
-function buildNames() {
-  const el   = document.getElementById('nameInputs');
-  const prev = [...el.querySelectorAll('input')].map(i => i.value);
+function buildNames(){
+
+  const el = document.getElementById('nameInputs');
+
+  const prev =
+    [...el.querySelectorAll('input')]
+      .map(i => i.value);
+
   el.innerHTML = '';
-  for (let i = 0; i < numPlayers; i++) {
-    const inp     = document.createElement('input');
+
+  for(let i = 0; i < numPlayers; i++){
+
+    const inp = document.createElement('input');
+
     inp.className = 'name-input';
-    inp.type      = 'text';
+
     inp.placeholder = defNames[i];
-    inp.value       = prev[i] || '';
+
+    inp.value = prev[i] || '';
+
     el.appendChild(inp);
   }
 }
 
-function startGame() {
-  players = [...document.querySelectorAll('.name-input')].map((inp, i) => ({
-    name : inp.value.trim() || defNames[i],
-    tiles: []          // tiles[last] = top tile (only this one is stealable)
-  }));
+function startGame(){
+
+  players =
+    [...document.querySelectorAll('.name-input')]
+      .map((inp, i) => ({
+        name: inp.value.trim() || defNames[i],
+        tiles:[]
+      }));
+
   currentPlayer = 0;
-  tableTiles    = Array.from({length: 16}, (_, i) => 21 + i);  // [21,22,...,36]
+
+  tableTiles =
+    Array.from({length:16}, (_,i) => 21 + i);
+
   resetTurn();
+
   showScreen('game');
+
   renderAll();
 }
 
-function resetGame() {
+function resetGame(){
   showScreen('setup');
 }
 
-/* ══════════════════════════════════════════════
-   HELPERS
-══════════════════════════════════════════════ */
-function wormValue(tile) {
-  if (tile <= 24) return 1;
-  if (tile <= 28) return 2;
-  if (tile <= 32) return 3;
-  return 4;
-}
+function resetTurn(){
 
-function label(v)   { return v === 'W' ? '🐛' : String(v); }
-function turnScore(){ return chosenDice.reduce((s,d) => s + (d==='W' ? 5 : d), 0); }
-function pWorms(p)  { return p.tiles.reduce((s,t) => s + wormValue(t), 0); }
-
-function resetTurn() {
-  dice       = [];
+  dice = [];
   chosenDice = [];
-  locked     = [];
+  locked = [];
 }
 
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+function showScreen(id){
+
+  document.querySelectorAll('.screen')
+    .forEach(s => s.classList.remove('active'));
+
+  document.getElementById(id)
+    .classList.add('active');
 }
 
-function setInstruction(msg) {
+function setInstruction(msg){
   document.getElementById('instruction').textContent = msg;
 }
 
-/* ══════════════════════════════════════════════
+function wormValue(tile){
+
+  if(tile <= 24) return 1;
+  if(tile <= 28) return 2;
+  if(tile <= 32) return 3;
+
+  return 4;
+}
+
+function label(v){
+  return v === 'W' ? '🐛' : String(v);
+}
+
+function turnScore(){
+
+  return chosenDice.reduce((s,d) =>
+    s + (d === 'W' ? 5 : d), 0);
+}
+
+function pWorms(p){
+
+  return p.tiles.reduce((s,t) =>
+    s + wormValue(t), 0);
+}
+
+/* =========================
    ROLL
-   Generates fresh dice for the remaining slots.
-   After clicking a die (lockValue), dice[] is
-   cleared, making Roll available again.
-══════════════════════════════════════════════ */
-function doRoll() {
-  // Guard: only callable when no dice are currently showing
-  if (dice.length > 0) return;
+========================= */
+
+function doRoll(){
+
+  if(dice.length > 0) return;
 
   const remaining = 8 - chosenDice.length;
-  if (remaining === 0) {            // all 8 dice already locked → force stop
+
+  if(remaining === 0){
     doStop();
     return;
   }
 
-  // Generate 'remaining' new dice
-  dice = Array.from({length: remaining}, () => {
+  dice = Array.from({length:remaining}, () => {
+
     const v = Math.floor(Math.random() * 6) + 1;
+
     return v === 6 ? 'W' : v;
   });
 
-  // Check for forced fail: every value in this roll is already locked
-  const freshValues = [...new Set(dice)].filter(v => !locked.includes(v));
-  if (freshValues.length === 0) {
-    renderDiceArea(true);   // show the useless dice for clarity
+  const freshValues =
+    [...new Set(dice)]
+      .filter(v => !locked.includes(v));
+
+  if(freshValues.length === 0){
+
+    renderDiceArea(true);
+
     updateButtons();
-    showOverlay('😬', 'Geen nieuwe symbolen!',
-      'Alle gegooid symbolen zijn al eerder gekozen. Beurt mislukt!', fail);
+
+    showOverlay(
+      '😬',
+      'Geen nieuwe symbolen!',
+      'Alle gegooide symbolen zijn al gekozen.',
+      fail
+    );
+
     return;
   }
 
-  renderDiceArea(true);   // true = play roll animation
+  renderDiceArea(true);
+
   updateButtons();
-  setInstruction(`Klik op een dobbelsteen om hem te kiezen (${remaining} over)`);
+
+  setInstruction(
+    `Klik op een dobbelsteen (${remaining} over)`
+  );
 }
 
-/* ══════════════════════════════════════════════
-   LOCK A VALUE
-   Clicking a die immediately locks ALL dice
-   showing that value. No separate confirm step.
-   After locking, dice[] is cleared so Roll
-   becomes available again.
-══════════════════════════════════════════════ */
-function lockValue(value) {
-  if (locked.includes(value))  return;   // already locked this turn
-  if (!dice.includes(value))   return;   // safety check
+/* =========================
+   LOCK VALUE
+========================= */
 
-  // Move every die of this value from dice[] to chosenDice[]
+function lockValue(value){
+
+  if(locked.includes(value)) return;
+  if(!dice.includes(value)) return;
+
   locked.push(value);
-  chosenDice.push(...dice.filter(d => d === value));
-  dice = [];   // ← clear roll so Roll button becomes available
+
+  chosenDice.push(
+    ...dice.filter(d => d === value)
+  );
+
+  dice = [];
 
   renderDiceArea();
+
   renderChosen();
+
   updateHeader();
 
-  // All 8 dice are locked → auto stop
-  if (chosenDice.length === 8) {
+  if(chosenDice.length === 8){
+
     updateButtons();
-    setInstruction('Alle dobbelstenen gekozen — beurt wordt beëindigd!');
+
+    setInstruction(
+      'Alle dobbelstenen gekozen!'
+    );
+
     setTimeout(doStop, 600);
+
     return;
   }
 
   updateButtons();
-  setInstruction('Gooi de overige dobbelstenen opnieuw, of stop je beurt');
+
+  setInstruction(
+    'Gooi opnieuw of stop je beurt'
+  );
 }
 
-/* ══════════════════════════════════════════════
+/* =========================
    STOP TURN
-   Rules:
-   1. Must have locked at least one worm (🐛)
-   2. Steal opponent's exact top tile  (exact only)
-   3. Take exact tile from table row
-   4. Take highest table tile < score  (row only)
-   5. Fail
-══════════════════════════════════════════════ */
-function doStop() {
-  // Need at least one worm locked
-  if (!locked.includes('W')) {
-    showOverlay('🐛', 'Geen worm!',
-      'Je moet minstens één regenworm gegooid hebben om een tegel te pakken. Beurt mislukt!', fail);
+========================= */
+
+function doStop(){
+
+  if(!locked.includes('W')){
+
+    showOverlay(
+      '🐛',
+      'Geen worm!',
+      'Je moet minstens één worm hebben.',
+      fail
+    );
+
     return;
   }
 
   const score = turnScore();
 
-  // 1. Steal exact tile from any opponent's TOP tile
-  for (let i = 0; i < players.length; i++) {
-    if (i === currentPlayer) continue;
-    const p   = players[i];
-    const top = p.tiles[p.tiles.length - 1];   // only top tile is visible/stealable
-    if (top === score) {
-      players[currentPlayer].tiles.push(p.tiles.pop());
-      showOverlay('🎉', 'Gestolen!',
-        `${p.name} verliest tegel ${score} (🐛${wormValue(score)}) — jij pakt hem!`, nextTurn);
+  for(let i = 0; i < players.length; i++){
+
+    if(i === currentPlayer) continue;
+
+    const p = players[i];
+
+    const top =
+      p.tiles[p.tiles.length - 1];
+
+    if(top === score){
+
+      players[currentPlayer]
+        .tiles.push(p.tiles.pop());
+
+      showOverlay(
+        '🎉',
+        'Gestolen!',
+        `${p.name} verliest tegel ${score}`,
+        nextTurn
+      );
+
       return;
     }
   }
 
-  // 2. Exact tile from table row
-  if (tableTiles.includes(score)) {
-    tableTiles = tableTiles.filter(t => t !== score);
-    players[currentPlayer].tiles.push(score);
-    afterTake(`Tegel ${score} gepakt! (🐛${wormValue(score)})`);
+  if(tableTiles.includes(score)){
+
+    tableTiles =
+      tableTiles.filter(t => t !== score);
+
+    players[currentPlayer]
+      .tiles.push(score);
+
+    afterTake(
+      `Tegel ${score} gepakt!`
+    );
+
     return;
   }
 
-  // 3. Highest available table tile that is LOWER than score
-  //    (only the row counts here — opponents' tiles cannot be taken at lower value)
-  const lower = tableTiles.filter(t => t < score);
-  if (lower.length > 0) {
-    const best = lower[lower.length - 1];     // tableTiles is sorted → last = highest ≤ score
-    tableTiles = tableTiles.filter(t => t !== best);
-    players[currentPlayer].tiles.push(best);
-    afterTake(`Score ${score} — tegel ${score} niet beschikbaar, tegel ${best} gepakt! (🐛${wormValue(best)})`);
+  const lower =
+    tableTiles.filter(t => t < score);
+
+  if(lower.length > 0){
+
+    const best = lower[lower.length - 1];
+
+    tableTiles =
+      tableTiles.filter(t => t !== best);
+
+    players[currentPlayer]
+      .tiles.push(best);
+
+    afterTake(
+      `Tegel ${best} gepakt!`
+    );
+
     return;
   }
 
-  // 4. Nothing works → fail
-  showOverlay('😢', 'Helaas!',
-    `Score ${score}, maar er is geen tegel beschikbaar. Beurt mislukt!`, fail);
+  showOverlay(
+    '😢',
+    'Helaas!',
+    `Geen tegel beschikbaar.`,
+    fail
+  );
 }
 
-function afterTake(msg) {
-  if (tableTiles.length === 0) {
-    // Table is empty → game over
+function afterTake(msg){
+
+  if(tableTiles.length === 0){
+
     renderGameOver();
-    showOverlay('✅', 'Tegel gepakt!', msg, () => showScreen('gameover'));
-  } else {
-    showOverlay('✅', 'Tegel gepakt!', msg, nextTurn);
+
+    showOverlay(
+      '✅',
+      'Tegel gepakt!',
+      msg,
+      () => showScreen('gameover')
+    );
+
+  }else{
+
+    showOverlay(
+      '✅',
+      'Tegel gepakt!',
+      msg,
+      nextTurn
+    );
   }
 }
 
-/* ══════════════════════════════════════════════
+/* =========================
    FAIL
-   1. Player returns their top tile to the row
-   2. Highest tile in row is flipped face-down
-      (permanently removed) UNLESS the returned
-      tile itself is the highest — then it just
-      stays face-up, and no other tile is removed.
-══════════════════════════════════════════════ */
-function fail() {
-  const p        = players[currentPlayer];
-  let   returned = null;
+========================= */
 
-  if (p.tiles.length > 0) {
+function fail(){
+
+  const p = players[currentPlayer];
+
+  let returned = null;
+
+  if(p.tiles.length > 0){
+
     returned = p.tiles.pop();
+
     tableTiles.push(returned);
-    tableTiles.sort((a, b) => a - b);
+
+    tableTiles.sort((a,b)=>a-b);
   }
 
-  if (tableTiles.length > 0) {
-    const highest = tableTiles[tableTiles.length - 1];
-    if (highest !== returned) {
-      tableTiles.pop();  // flip highest face-down → out of game permanently
+  if(tableTiles.length > 0){
+
+    const highest =
+      tableTiles[tableTiles.length - 1];
+
+    if(highest !== returned){
+      tableTiles.pop();
     }
-    // If returned tile IS the highest → it stays face-up, nothing else removed
   }
 
-  if (tableTiles.length === 0) {
+  if(tableTiles.length === 0){
+
     renderGameOver();
+
     showScreen('gameover');
-  } else {
+
+  }else{
     nextTurn();
   }
 }
 
-/* ══════════════════════════════════════════════
+/* =========================
    NEXT TURN
-══════════════════════════════════════════════ */
-function nextTurn() {
-  currentPlayer = (currentPlayer + 1) % players.length;
+========================= */
+
+function nextTurn(){
+
+  currentPlayer =
+    (currentPlayer + 1) % players.length;
+
   resetTurn();
+
   renderAll();
 }
 
-/* ══════════════════════════════════════════════
+/* =========================
    OVERLAY
-══════════════════════════════════════════════ */
+========================= */
+
 let overlayCallback = null;
 
-function showOverlay(icon, title, text, cb) {
-  document.getElementById('mIcon').textContent  = icon;
+function showOverlay(icon,title,text,cb){
+
+  document.getElementById('mIcon').textContent = icon;
   document.getElementById('mTitle').textContent = title;
-  document.getElementById('mText').textContent  = text;
+  document.getElementById('mText').textContent = text;
+
   overlayCallback = cb;
-  document.getElementById('overlay').classList.add('show');
-  renderAll();   // update board behind the overlay immediately
+
+  document.getElementById('overlay')
+    .classList.add('show');
+
+  renderAll();
 }
 
-function closeOverlay() {
-  document.getElementById('overlay').classList.remove('show');
-  if (overlayCallback) {
+function closeOverlay(){
+
+  document.getElementById('overlay')
+    .classList.remove('show');
+
+  if(overlayCallback){
+
     const fn = overlayCallback;
+
     overlayCallback = null;
+
     fn();
   }
 }
 
-/* ══════════════════════════════════════════════
+/* =========================
    RENDER
-══════════════════════════════════════════════ */
-function renderAll() {
+========================= */
+
+function renderAll(){
+
   renderTiles();
+
   renderDiceArea();
+
   renderChosen();
+
   renderPlayers();
+
   updateHeader();
+
   updateButtons();
 }
 
-// Table tile row
-function renderTiles() {
+function renderTiles(){
+
   const el = document.getElementById('tileRow');
+
   el.innerHTML = '';
+
   tableTiles.forEach(t => {
+
     const d = document.createElement('div');
+
     d.className = 'tile';
-    d.innerHTML = `<div class="tile-n">${t}</div><div class="tile-w">🐛${wormValue(t)}</div>`;
+
+    d.innerHTML =
+      `<div class="tile-n">${t}</div>
+       <div class="tile-w">🐛${wormValue(t)}</div>`;
+
     el.appendChild(d);
   });
 }
 
-// Current roll — each die is clickable (immediate lock)
-function renderDiceArea(animate = false) {
+function renderDiceArea(animate=false){
+
   const el = document.getElementById('diceRow');
+
   el.innerHTML = '';
-  if (dice.length === 0) return;
 
-  dice.forEach((v, idx) => {
-    const alreadyLocked = locked.includes(v);
+  if(dice.length === 0) return;
+
+  dice.forEach((v,idx) => {
+
+    const alreadyLocked =
+      locked.includes(v);
+
     const die = document.createElement('div');
-    die.className = 'die' + (alreadyLocked ? ' used' : '');
-    if (animate) {
-      die.classList.add('rolling');
-      die.style.animationDelay = (idx * 0.045) + 's';
-    }
-    die.textContent = label(v);
-    die.innerHTML   += '<div class="dwell-ring"></div>';
 
-    if (!alreadyLocked) {
+    die.className =
+      'die' + (alreadyLocked ? ' used' : '');
+
+    if(animate){
+
+      die.classList.add('rolling');
+
+      die.style.animationDelay =
+        (idx * 0.05) + 's';
+    }
+
+    die.innerHTML =
+      `${label(v)}
+       <div class="dwell-ring"></div>`;
+
+    if(!alreadyLocked){
+
       die.onclick = () => lockValue(v);
+
       applyDwell(die, () => lockValue(v));
     }
+
     el.appendChild(die);
   });
 }
 
-// Chosen / locked dice
-function renderChosen() {
-  const el = document.getElementById('chosenArea');
+function renderChosen(){
+
+  const el =
+    document.getElementById('chosenArea');
+
   el.innerHTML = '';
+
   chosenDice.forEach(v => {
+
     const d = document.createElement('div');
-    d.className   = 'c-die';
+
+    d.className = 'c-die';
+
     d.textContent = label(v);
+
     el.appendChild(d);
   });
 }
 
-// Player cards at the bottom
-function renderPlayers() {
-  const el = document.getElementById('playersGrid');
+function renderPlayers(){
+
+  const el =
+    document.getElementById('playersGrid');
+
   el.innerHTML = '';
-  players.forEach((p, i) => {
-    const top  = p.tiles.length > 0 ? p.tiles[p.tiles.length - 1] : null;
+
+  players.forEach((p,i) => {
+
+    const top =
+      p.tiles.length > 0
+        ? p.tiles[p.tiles.length - 1]
+        : null;
+
     const card = document.createElement('div');
-    card.className = 'p-card' + (i === currentPlayer ? ' cur' : '');
+
+    card.className =
+      'p-card' + (i === currentPlayer ? ' cur' : '');
+
     card.innerHTML = `
       <div class="p-name">${p.name}</div>
       <div class="p-worms">🐛 ${pWorms(p)}</div>
-      ${top
-        ? `<div class="p-tile">
-             <div class="p-tile-n">${top}</div>
-             <div class="p-tile-w">🐛${wormValue(top)}</div>
+
+      ${
+        top
+        ? `
+          <div class="p-tile">
+            <div>${top}</div>
+            <div>🐛${wormValue(top)}</div>
+          </div>
+        `
+        : `<div class="p-empty">Geen tegels</div>`
+      }
+
+      ${
+        p.tiles.length > 1
+        ? `<div class="p-stack">
+            + ${p.tiles.length - 1} bedekt
            </div>`
-        : `<div class="p-empty">Geen tegels</div>`}
-      ${p.tiles.length > 1
-        ? `<div class="p-stack">+ ${p.tiles.length - 1} bedekt</div>`
-        : ''}
+        : ''
+      }
     `;
+
     el.appendChild(card);
   });
 }
 
-// Score header
-function updateHeader() {
+function updateHeader(){
+
   const p = players[currentPlayer];
-  if (!p) return;
-  document.getElementById('hName').textContent  = p.name;
-  document.getElementById('hScore').textContent = turnScore();
-  document.getElementById('hWorms').textContent = '🐛 ' + pWorms(p);
+
+  if(!p) return;
+
+  document.getElementById('hName')
+    .textContent = p.name;
+
+  document.getElementById('hScore')
+    .textContent = turnScore();
+
+  document.getElementById('hWorms')
+    .textContent = '🐛 ' + pWorms(p);
 }
 
-// Button states — simple:
-//   Roll  → enabled only when dice[] is empty (between rolls)
-//   Stop  → enabled when dice[] empty AND at least one value locked
-function updateButtons() {
-  const empty  = dice.length === 0;
+function updateButtons(){
+
+  const empty = dice.length === 0;
+
   const hasAny = locked.length > 0;
-  document.getElementById('btnRoll').disabled = !empty;
-  document.getElementById('btnStop').disabled = !(empty && hasAny);
+
+  document.getElementById('btnRoll')
+    .disabled = !empty;
+
+  document.getElementById('btnStop')
+    .disabled = !(empty && hasAny);
 }
 
-/* ══════════════════════════════════════════════
+/* =========================
    GAME OVER
-   Tiebreak: most worms first; equal worms →
-   player with highest top tile wins.
-══════════════════════════════════════════════ */
-function renderGameOver() {
-  const ranked = [...players]
-    .map(p => ({
-      name   : p.name,
-      worms  : pWorms(p),
-      topTile: p.tiles.length ? p.tiles[p.tiles.length - 1] : 0
-    }))
-    .sort((a, b) => b.worms - a.worms || b.topTile - a.topTile);
+========================= */
 
-  const list = document.getElementById('rankingList');
+function renderGameOver(){
+
+  const ranked =
+    [...players]
+      .map(p => ({
+        name:p.name,
+        worms:pWorms(p),
+        topTile:
+          p.tiles.length
+            ? p.tiles[p.tiles.length - 1]
+            : 0
+      }))
+      .sort((a,b)=>
+        b.worms - a.worms ||
+        b.topTile - a.topTile
+      );
+
+  const list =
+    document.getElementById('rankingList');
+
   list.innerHTML = '';
-  ranked.forEach((p, i) => {
+
+  ranked.forEach((p,i) => {
+
     const row = document.createElement('div');
-    row.className = 'rank-row fade-up' + (i === 0 ? ' first' : '');
-    row.style.animationDelay = (i * 0.1) + 's';
+
+    row.className =
+      'rank-row' + (i === 0 ? ' first' : '');
+
     row.innerHTML = `
-      <div class="rank-pos">${['🥇','🥈','🥉'][i] || (i+1) + '.'}</div>
-      <div class="rank-name">${p.name}</div>
-      <div class="rank-worms">🐛 ${p.worms}</div>
+      <div class="rank-pos">
+        ${['🥇','🥈','🥉'][i] || (i+1)+'.'}
+      </div>
+
+      <div class="rank-name">
+        ${p.name}
+      </div>
+
+      <div class="rank-worms">
+        🐛 ${p.worms}
+      </div>
     `;
+
     list.appendChild(row);
   });
-
-  // Attach dwell to replay button now that gameover screen is rendered
-  const btn = document.getElementById('btnReplay');
-  if (btn) applyDwell(btn, () => { if (!btn.disabled) btn.click(); });
 }
- // ═══════════════════════════════════════
-// EYE TRACKING (GOED GEPLAATST)
-// ═══════════════════════════════════════
+
+/* =========================
+   EYE TRACKING
+========================= */
 
 let camera;
 let faceMesh;
 let eyeEnabled = false;
 
-function startTracking() {
+function startTracking(){
+
+  if(eyeEnabled) return;
+
   eyeEnabled = true;
 
   const video = document.createElement("video");
+
   video.autoplay = true;
   video.playsInline = true;
   video.style.display = "none";
+
   document.body.appendChild(video);
 
   faceMesh = new FaceMesh({
-    locateFile: (f) =>
+    locateFile:(f)=>
       `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
   });
 
   faceMesh.setOptions({
-    maxNumFaces: 1,
-    refineLandmarks: true,
-    minDetectionConfidence: 0.5,
-    minTrackingConfidence: 0.5
+    maxNumFaces:1,
+    refineLandmarks:true,
+    minDetectionConfidence:0.5,
+    minTrackingConfidence:0.5
   });
 
   faceMesh.onResults(onFaceResults);
 
-  camera = new Camera(video, {
+  camera = new Camera(video,{
     onFrame: async () => {
-      await faceMesh.send({ image: video });
+      await faceMesh.send({image:video});
     },
-    width: 640,
-    height: 480
+    width:640,
+    height:480
   });
 
   camera.start();
 }
 
-function onFaceResults(results) {
+function onFaceResults(results){
 
-  if (!results.multiFaceLandmarks?.length) return;
+  if(!results.multiFaceLandmarks?.length) return;
 
-  const face = results.multiFaceLandmarks[0];
+  const face =
+    results.multiFaceLandmarks[0];
 
   const irisL = face[468];
   const irisR = face[473];
@@ -877,7 +1661,6 @@ function onFaceResults(results) {
   let x = 1 - ((irisL.x + irisR.x) / 2);
   let y = ((irisL.y + irisR.y) / 2);
 
-  // gevoeligheid
   x = (x - 0.5) * 5 + 0.5;
   y = (y - 0.5) * 8 + 0.5;
 
@@ -887,21 +1670,88 @@ function onFaceResults(results) {
   const px = x * window.innerWidth;
   const py = y * window.innerHeight;
 
-  const cursor = document.getElementById("eyeCursor");
+  const cursor =
+    document.getElementById("eyeCursor");
 
   cursor.style.left = px + "px";
   cursor.style.top = py + "px";
 
-  window.EyeTracker = {
-    x: px,
-    y: py
-  };
-
-  checkEyeHover();
+  checkEyeHover(px, py);
 }
- 
+
+/* =========================
+   EYE HOVER
+========================= */
+
+let eyeHoverElement = null;
+let eyeHoverStart = 0;
+
+function checkEyeHover(ex, ey){
+
+  if(!eyeEnabled || !dwellMode) return;
+
+  const elements =
+    document.querySelectorAll(
+      '.big-btn, .die, .msg-ok'
+    );
+
+  let hovered = null;
+
+  elements.forEach(el => {
+
+    if(el.disabled) return;
+
+    const rect =
+      el.getBoundingClientRect();
+
+    const inside =
+      ex > rect.left &&
+      ex < rect.right &&
+      ey > rect.top &&
+      ey < rect.bottom;
+
+    if(inside){
+      hovered = el;
+    }
+  });
+
+  if(hovered !== eyeHoverElement){
+
+    eyeHoverElement = hovered;
+
+    eyeHoverStart = Date.now();
+
+    document.querySelectorAll('.dwell-ring')
+      .forEach(r => r.style.background = '');
+  }
+
+  if(!hovered) return;
+
+  const progress =
+    (Date.now() - eyeHoverStart)
+      / dwellDuration;
+
+  const ring =
+    hovered.querySelector('.dwell-ring');
+
+  if(ring){
+
+    ring.style.background =
+      `conic-gradient(
+        rgba(255,255,255,.55)
+        ${progress * 360}deg,
+        transparent 0deg
+      )`;
+  }
+
+  if(progress >= 1){
+
+    hovered.click();
+
+    eyeHoverElement = null;
+  }
+}
+
 </script>
 </body>
 </html>
- 
-
