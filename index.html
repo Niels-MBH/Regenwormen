@@ -54,12 +54,16 @@ body{
 
 /* screens */
 .screen{
-  display:none;
-  width:100%;
+  display:none !important;
 }
 
 .screen.active{
-  display:block;
+  display:block !important;
+}
+  
+body > #game,
+body > #gameover{
+  display:none !important;
 }
 
 /* setup */
