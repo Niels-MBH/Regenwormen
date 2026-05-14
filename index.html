@@ -1638,21 +1638,7 @@ let camera;
 let faceMesh;
 let eyeEnabled = false;
 
-let calibration = null;
-let smoothingX = 0.5;
-let smoothingY = 0.5;
-
 function startTracking(){
-
-  function calibrateEyes(face){
-  const irisL = face[468];
-  const irisR = face[473];
-
-  calibration = {
-    x: (irisL.x + irisR.x) / 2,
-    y: (irisL.y + irisR.y) / 2
-  };
-}
 
   if(eyeEnabled) return;
 
@@ -1693,62 +1679,28 @@ function startTracking(){
 
 function onFaceResults(results){
 
-  if(!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0){
-    return;
-  }
+  if(!results.multiFaceLandmarks?.length) return;
 
-  const face = results.multiFaceLandmarks[0];
+  const face =
+    results.multiFaceLandmarks[0];
 
   const irisL = face[468];
   const irisR = face[473];
 
-  // ❗ safety check (DIT mist waarschijnlijk nu)
-  if(!irisL || !irisR){
-    console.log("no iris data");
-    return;
-  }
+  let x = 1 - ((irisL.x + irisR.x) / 2);
+  let y = ((irisL.y + irisR.y) / 2);
 
-  let x = (irisL.x + irisR.x) / 2;
-  let y = (irisL.y + irisR.y) / 2;
-
-  // debug
-  console.log("raw:", x, y);
-
-  const px = (1 - x) * window.innerWidth;
-  const py = y * window.innerHeight;
-
-  const cursor = document.getElementById("eyeCursor");
-
-  cursor.style.left = px + "px";
-  cursor.style.top = py + "px";
-
-  checkEyeHover(px, py);
-}
-
-  // eerst calibreren (recht kijken)
-if(!calibration){
-  calibrateEyes(face);
-}
-
-  // verschil met neutraal punt
-  let dx = rawX - calibration.x;
-  let dy = rawY - calibration.y;
-
-  const sensitivity = 6;
-
-  let x = 0.5 - dx * sensitivity;
-  let y = 0.5 + dy * sensitivity;
+  x = (x - 0.5) * 5 + 0.5;
+  y = (y - 0.5) * 8 + 0.5;
 
   x = Math.max(0, Math.min(1, x));
   y = Math.max(0, Math.min(1, y));
 
-  smoothingX += (x - smoothingX) * 0.15;
-  smoothingY += (y - smoothingY) * 0.15;
+  const px = x * window.innerWidth;
+  const py = y * window.innerHeight;
 
-  const px = smoothingX * window.innerWidth;
-  const py = smoothingY * window.innerHeight;
-
-  const cursor = document.getElementById("eyeCursor");
+  const cursor =
+    document.getElementById("eyeCursor");
 
   cursor.style.left = px + "px";
   cursor.style.top = py + "px";
