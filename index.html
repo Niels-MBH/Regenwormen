@@ -1089,6 +1089,7 @@ function applyDwell(el, callback){
    GAME STATE
 ========================= */
 const rollSound = new Audio('dice.mp3');
+const sparkleSound = new Audio('sparkle.mp3');
 let soundEnabled = true;
 let players = [];
 let currentPlayer = 0;
@@ -1302,6 +1303,13 @@ function lockValue(value){
 
   if(locked.includes(value)) return;
   if(!dice.includes(value)) return;
+
+  if(value === 'W' && soundEnabled){
+
+  sparkleSound.currentTime = 0;
+  sparkleSound.play();
+
+}
 
   locked.push(value);
 
