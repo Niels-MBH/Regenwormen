@@ -1693,15 +1693,37 @@ function startTracking(){
 
 function onFaceResults(results){
 
-  if(!results.multiFaceLandmarks?.length) return;
+  if(!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0){
+    return;
+  }
 
   const face = results.multiFaceLandmarks[0];
 
   const irisL = face[468];
   const irisR = face[473];
 
-  const rawX = (irisL.x + irisR.x) / 2;
-  const rawY = (irisL.y + irisR.y) / 2;
+  // ❗ safety check (DIT mist waarschijnlijk nu)
+  if(!irisL || !irisR){
+    console.log("no iris data");
+    return;
+  }
+
+  let x = (irisL.x + irisR.x) / 2;
+  let y = (irisL.y + irisR.y) / 2;
+
+  // debug
+  console.log("raw:", x, y);
+
+  const px = (1 - x) * window.innerWidth;
+  const py = y * window.innerHeight;
+
+  const cursor = document.getElementById("eyeCursor");
+
+  cursor.style.left = px + "px";
+  cursor.style.top = py + "px";
+
+  checkEyeHover(px, py);
+}
 
   // eerst calibreren (recht kijken)
 if(!calibration){
