@@ -216,21 +216,7 @@ body{
   inset:0;
   border-radius:inherit;
   pointer-events:none;
-
-  /* 👇 BELANGRIJK: donker + contrast */
-  background:conic-gradient(rgba(0,0,0,.85) 0deg, transparent 0deg);
-
-  /* extra zichtbaarheid op witte dobbelstenen */
-  box-shadow:
-    inset 0 0 0 3px rgba(0,0,0,.25),
-    0 0 10px rgba(0,0,0,.25);
-
-  opacity:1;
-}
-  .die:hover .dwell-ring{
-  box-shadow:
-    inset 0 0 0 3px rgba(52,152,219,.6),
-    0 0 12px rgba(52,152,219,.5);
+  background:conic-gradient(rgba(255,255,255,.55) 0deg,transparent 0deg);
 }
 
 /* dwell */
@@ -475,28 +461,8 @@ body{
 }
 
 .die.used{
-  opacity:0.6;
-  filter: grayscale(1) brightness(0.6);
-  cursor:not-allowed;
-  position:relative;
-  transform:none !important;
-  box-shadow:none !important;
-}
-
-  .die.used::after{
-  content:'✖';
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  font-size:2rem;
-  color:rgba(0,0,0,.4);
-  font-weight:900;
-
-  background:rgba(0,0,0,.15);
-  border-radius:inherit;
+  opacity:.25;
+  cursor:default;
 }
 
 .chosen-area{
