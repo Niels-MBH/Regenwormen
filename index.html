@@ -747,6 +747,11 @@ body{
       <div class="dwell-ring"></div>
     </button>
 
+    <button class="big-btn btn-orange" onclick="showRules()">
+  📜 Spelregels
+  <div class="dwell-ring"></div>
+</button>
+
   </div>
 
   <div class="dwell-block">
@@ -782,7 +787,50 @@ body{
 </div>
 
 <!-- GAME -->
-<div id="game" class="screen">
+  <!-- RULES -->
+<div id="rules" class="screen">
+
+  <div id="setup">
+
+    <div class="logo">📜 Spelregels</div>
+
+    <div class="card" style="text-align:left; line-height:1.6;">
+
+      <h3>🎯 Doel</h3>
+      Verzamel zoveel mogelijk wormen door slim te gooien.
+
+      <br><br>
+
+      <h3>🎲 Spelverloop</h3>
+      - Gooi 8 dobbelstenen<br>
+      - Kies gelijke symbolen<br>
+      - Gooi opnieuw met de rest<br>
+      - Stop wanneer je wilt
+
+      <br><br>
+
+      <h3>🐛 Wormen</h3>
+      - Elke tegel = wormen<br>
+      - Hogere tegels = meer wormen
+
+      <br><br>
+
+      <h3>⚠️ Belangrijk</h3>
+      - Je moet minstens 1 worm hebben om te stoppen<br>
+      - Anders verlies je je beurt
+
+    </div>
+
+    <button class="big-btn btn-green" onclick="showScreen('setup')">
+      ⬅ Terug
+      <div class="dwell-ring"></div>
+    </button>
+
+  </div>
+
+</div>
+
+  <div id="game" class="screen">
 
   <div class="g-header">
 
@@ -1041,6 +1089,9 @@ function buildNames(){
 
 function startGame(){
 
+  function showRules(){
+  showScreen('rules');
+}
   players =
     [...document.querySelectorAll('.name-input')]
       .map((inp, i) => ({
