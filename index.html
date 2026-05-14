@@ -748,6 +748,13 @@ body{
     </button>
 
     <br>
+    
+    <button class="big-btn btn-purple" id="soundBtn" onclick="toggleSound()">
+  🔊 Geluid aan
+  <div class="dwell-ring"></div>
+</button>
+
+    <br>
 
     <button class="big-btn btn-orange" onclick="showRules()">
   📜 Spelregels
@@ -1077,6 +1084,7 @@ function applyDwell(el, callback){
    GAME STATE
 ========================= */
 const rollSound = new Audio('dice.mp3');
+let soundEnabled = true;
 let players = [];
 let currentPlayer = 0;
 let tableTiles = [];
@@ -1231,8 +1239,10 @@ function pWorms(p){
 
 function doRoll(){
 
-rollSound.currentTime = 0;
-rollSound.play();
+if(soundEnabled){
+  rollSound.currentTime = 0;
+  rollSound.play();
+}
 
   if(dice.length > 0) return;
 
@@ -1903,7 +1913,18 @@ function checkEyeHover(ex, ey){
   console.log("rules clicked");
   showScreen('rules');
 }
+function toggleSound(){
 
+  soundEnabled = !soundEnabled;
+
+  const btn = document.getElementById('soundBtn');
+
+  if(soundEnabled){
+    btn.textContent = '🔊 Geluid aan';
+  }else{
+    btn.textContent = '🔇 Geluid uit';
+  }
+}
 </script>
 </body>
 </html>
