@@ -1170,7 +1170,7 @@ function buildNames(){
 
 function startGame(){
 
- players =
+  players =
     [...document.querySelectorAll('.name-input')]
       .map((inp, i) => ({
         name: inp.value.trim() || defNames[i],
@@ -1184,11 +1184,9 @@ function startGame(){
 
   resetTurn();
 
-  // 🔥 BELANGRIJK: eerst alles uit
-  document.querySelectorAll('.screen')
-    .forEach(s => s.classList.remove('active'));
-
-  // 🔥 dan alleen game aan
+  // 🔥 HARD RESET ALLE SCREENS
+  document.getElementById('setup').classList.remove('active');
+  document.getElementById('gameover').classList.remove('active');
   document.getElementById('game').classList.add('active');
 
   renderAll();
