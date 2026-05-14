@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>🐛 Regenwormen - Setup</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- SETUP -->
+<div id="setup" class="screen active">
+
+  <div class="logo-worm">🐛</div>
+  <div class="logo">Regenwormen</div>
+
+  <div class="card">
+
+    <label class="field-label">Hoeveel spelers?</label>
+    <div class="count-row" id="countRow"></div>
+
+    <label class="field-label">Namen</label>
+    <div class="name-inputs" id="nameInputs"></div>
+
+    <button class="big-btn btn-green" onclick="startGame()">
+      🐛 Spel starten!
+    </button>
+
+    <br>
+
+    <button class="big-btn btn-blue" onclick="startTracking()">
+      👁️ Eye tracking aan
+    </button>
+
+    <br>
+
+    <button class="big-btn btn-yellow" onclick="toggleSound()">
+      🔊 Geluid aan/uit
+    </button>
+
+    <br>
+
+    <button class="big-btn btn-orange" onclick="showRules()">
+      📜 Spelregels
+    </button>
+
+  </div>
+
+</div>
+
+<!-- RULES -->
+<div id="rules" class="screen">
+
+  <div class="card">
+
+    <h1>📜 Spelregels</h1>
+
+    <p>… jouw regels hier …</p>
+
+    <button onclick="showScreen('setup')">
+      ⬅ Terug
+    </button>
+
+  </div>
+
+</div>
+
+<script src="setup.js"></script>
+</body>
+</html>
