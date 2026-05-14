@@ -1184,10 +1184,7 @@ function startGame(){
 
   resetTurn();
 
-  // 🔥 HARD RESET ALLE SCREENS
-  document.getElementById('setup').classList.remove('active');
-  document.getElementById('gameover').classList.remove('active');
-  document.getElementById('game').classList.add('active');
+  showScreen('game');
 
   renderAll();
 }
@@ -1212,8 +1209,6 @@ function showScreen(id){
 
   if(el){
     el.classList.add('active');
-  }else{
-    console.warn("Screen niet gevonden:", id);
   }
 }
 
