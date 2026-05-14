@@ -1076,7 +1076,7 @@ function applyDwell(el, callback){
 /* =========================
    GAME STATE
 ========================= */
-
+const rollSound = new Audio('dice.mp3');
 let players = [];
 let currentPlayer = 0;
 let tableTiles = [];
@@ -1230,6 +1230,9 @@ function pWorms(p){
 ========================= */
 
 function doRoll(){
+
+rollSound.currentTime = 0;
+rollSound.play();
 
   if(dice.length > 0) return;
 
