@@ -1704,10 +1704,9 @@ function onFaceResults(results){
   const rawY = (irisL.y + irisR.y) / 2;
 
   // eerst calibreren (recht kijken)
-  if(!calibration){
-    calibrateEyes(face);
-    return;
-  }
+if(!calibration){
+  calibrateEyes(face);
+}
 
   // verschil met neutraal punt
   let dx = rawX - calibration.x;
