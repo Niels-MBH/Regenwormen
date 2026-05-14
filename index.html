@@ -790,7 +790,7 @@ body{
   <!-- RULES -->
 <div id="rules" class="screen">
 
-  <div id="setup">
+ <div class="card">
 
     <div class="logo">📜 Spelregels</div>
 
@@ -1830,6 +1830,10 @@ function checkEyeHover(ex, ey){
 
     eyeHoverElement = null;
   }
+}
+  window.showRules = function(){
+  console.log("rules clicked");
+  showScreen('rules');
 }
 
 </script>
