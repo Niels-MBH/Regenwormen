@@ -1638,7 +1638,21 @@ let camera;
 let faceMesh;
 let eyeEnabled = false;
 
+let calibration = null;
+let smoothingX = 0.5;
+let smoothingY = 0.5;
+
 function startTracking(){
+
+  function calibrateEyes(face){
+  const irisL = face[468];
+  const irisR = face[473];
+
+  calibration = {
+    x: (irisL.x + irisR.x) / 2,
+    y: (irisL.y + irisR.y) / 2
+  };
+}
 
   if(eyeEnabled) return;
 
@@ -1681,26 +1695,39 @@ function onFaceResults(results){
 
   if(!results.multiFaceLandmarks?.length) return;
 
-  const face =
-    results.multiFaceLandmarks[0];
+  const face = results.multiFaceLandmarks[0];
 
   const irisL = face[468];
   const irisR = face[473];
 
-  let x = 1 - ((irisL.x + irisR.x) / 2);
-  let y = ((irisL.y + irisR.y) / 2);
+  const rawX = (irisL.x + irisR.x) / 2;
+  const rawY = (irisL.y + irisR.y) / 2;
 
-  x = (x - 0.5) * 5 + 0.5;
-  y = (y - 0.5) * 8 + 0.5;
+  // eerst calibreren (recht kijken)
+  if(!calibration){
+    calibrateEyes(face);
+    return;
+  }
+
+  // verschil met neutraal punt
+  let dx = rawX - calibration.x;
+  let dy = rawY - calibration.y;
+
+  const sensitivity = 6;
+
+  let x = 0.5 - dx * sensitivity;
+  let y = 0.5 + dy * sensitivity;
 
   x = Math.max(0, Math.min(1, x));
   y = Math.max(0, Math.min(1, y));
 
-  const px = x * window.innerWidth;
-  const py = y * window.innerHeight;
+  smoothingX += (x - smoothingX) * 0.15;
+  smoothingY += (y - smoothingY) * 0.15;
 
-  const cursor =
-    document.getElementById("eyeCursor");
+  const px = smoothingX * window.innerWidth;
+  const py = smoothingY * window.innerHeight;
+
+  const cursor = document.getElementById("eyeCursor");
 
   cursor.style.left = px + "px";
   cursor.style.top = py + "px";
