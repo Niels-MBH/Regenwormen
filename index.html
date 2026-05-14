@@ -54,11 +54,11 @@ body{
 
 /* screens */
 .screen{
-  display:none !important;
+  display:none;
 }
 
 .screen.active{
-  display:block !important;
+  display:block;
 }
   
 body > #game,
@@ -1172,6 +1172,8 @@ function buildNames(){
 }
 
 function startGame(){
+  showScreen("game");
+}
 
   function showRules(){
   showScreen('rules');
