@@ -1036,7 +1036,7 @@ function applyDwell(el, callback){
 
   el.addEventListener('mouseenter', () => {
 
-    if(!dwellMode) return;
+   if(!players[currentPlayer]?.dwellMode) return;
 
     const ring = el.querySelector('.dwell-ring');
 
@@ -1142,12 +1142,21 @@ function buildNames(){
   const el = document.getElementById('nameInputs');
 
   const prev =
-    [...el.querySelectorAll('input')]
+    [...el.querySelectorAll('.name-input')]
       .map(i => i.value);
 
   el.innerHTML = '';
 
   for(let i = 0; i < numPlayers; i++){
+
+    const wrapper = document.createElement('div');
+
+    wrapper.className = 'player-setup';
+
+    wrapper.style.background = '#fff';
+    wrapper.style.padding = '12px';
+    wrapper.style.borderRadius = '14px';
+    wrapper.style.marginBottom = '10px';
 
     const inp = document.createElement('input');
 
@@ -1157,18 +1166,70 @@ function buildNames(){
 
     inp.value = prev[i] || '';
 
-    el.appendChild(inp);
+    /* eye tracking */
+    const eyeRow = document.createElement('div');
+
+    eyeRow.style.marginTop = '8px';
+
+    const eyeCheck = document.createElement('input');
+
+    eyeCheck.type = 'checkbox';
+    eyeCheck.className = 'eye-check';
+
+    const eyeLabel = document.createElement('label');
+
+    eyeLabel.textContent = ' Eye tracking';
+
+    eyeRow.appendChild(eyeCheck);
+    eyeRow.appendChild(eyeLabel);
+
+    /* dwell */
+    const dwellRow = document.createElement('div');
+
+    dwellRow.style.marginTop = '4px';
+
+    const dwellCheck = document.createElement('input');
+
+    dwellCheck.type = 'checkbox';
+    dwellCheck.className = 'dwell-check';
+
+    const dwellLabel = document.createElement('label');
+
+    dwellLabel.textContent = ' Dwell timer';
+
+    dwellRow.appendChild(dwellCheck);
+    dwellRow.appendChild(dwellLabel);
+
+    wrapper.appendChild(inp);
+    wrapper.appendChild(eyeRow);
+    wrapper.appendChild(dwellRow);
+
+    el.appendChild(wrapper);
   }
 }
 
 function startGame(){
 
-  players =
-    [...document.querySelectorAll('.name-input')]
-      .map((inp, i) => ({
-        name: inp.value.trim() || defNames[i],
-        tiles:[]
-      }));
+ const wrappers =
+  [...document.querySelectorAll('.player-setup')];
+
+players = wrappers.map((wrap, i) => ({
+
+  name:
+    wrap.querySelector('.name-input').value.trim()
+    || defNames[i],
+
+  tiles:[],
+
+  eyeTracking:
+    wrap.querySelector('.eye-check').checked,
+
+  dwellMode:
+    wrap.querySelector('.dwell-check').checked,
+
+  dwellDuration:1500
+
+}));
 
   currentPlayer = 0;
 
@@ -1180,6 +1241,8 @@ function startGame(){
   showScreen('game');
 
   renderAll();
+
+updateAccessibility();
 }
 
 function resetGame(){
@@ -1503,7 +1566,9 @@ function nextTurn(){
 
   resetTurn();
 
-  renderAll();
+ renderAll();
+
+updateAccessibility();
 }
 
 /* =========================
@@ -1854,7 +1919,12 @@ let eyeHoverStart = 0;
 
 function checkEyeHover(ex, ey){
 
-  if(!eyeEnabled || !dwellMode) return;
+ const player = players[currentPlayer];
+
+if(
+  !player?.eyeTracking ||
+  !player?.dwellMode
+) return;
 
   const elements =
     document.querySelectorAll(
@@ -1931,6 +2001,22 @@ function toggleSound(){
     btn.textContent = '🔊 Geluid aan';
   }else{
     btn.textContent = '🔇 Geluid uit';
+  }
+}
+  function updateAccessibility(){
+
+  const player = players[currentPlayer];
+
+  const cursor =
+    document.getElementById("eyeCursor");
+
+  if(player?.eyeTracking){
+
+    cursor.style.display = "block";
+
+  }else{
+
+    cursor.style.display = "none";
   }
 }
 </script>
