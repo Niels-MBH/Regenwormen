@@ -1013,6 +1013,8 @@ function toggleDwell(){
 
   dwellMode = !dwellMode;
 
+  updateAccessibility();
+
   document.getElementById('dwellToggle')
     .classList.toggle('on', dwellMode);
 
@@ -1036,7 +1038,7 @@ function applyDwell(el, callback){
 
   el.addEventListener('mouseenter', () => {
 
-   if(!players[currentPlayer]?.dwellMode) return;
+   if(!dwellMode && !players[currentPlayer]?.dwellMode) return;
 
     const ring = el.querySelector('.dwell-ring');
 
