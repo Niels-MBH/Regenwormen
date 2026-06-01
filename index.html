@@ -770,35 +770,7 @@ body{
 
   </div>
 
-  <div class="dwell-block">
 
-    <div class="dwell-header">
-      <div class="toggle" id="dwellToggle" onclick="toggleDwell()"></div>
-      Dwell-timer (voor oogbesturing)
-    </div>
-
-    <div class="dwell-explain">
-      Oogbesturingssoftware beweegt de cursor.
-      De dwell-timer klikt automatisch als je lang genoeg kijkt.
-    </div>
-
-    <div class="speed-row" id="speedRow">
-
-      <button class="speed-btn" data-ms="2500" onclick="setSpeed(this)">
-        Lang (2,5s)
-      </button>
-
-      <button class="speed-btn active" data-ms="1500" onclick="setSpeed(this)">
-        Normaal (1,5s)
-      </button>
-
-      <button class="speed-btn" data-ms="800" onclick="setSpeed(this)">
-        Kort (0,8s)
-      </button>
-
-    </div>
-
-  </div>
 
 </div>
 
@@ -1006,10 +978,10 @@ body{
    DWELL
 ========================= */
 
-let dwellMode = false;
+
 let dwellDuration = 1500;
 
-function toggleDwell(){
+
 
   dwellMode = !dwellMode;
 
@@ -1022,7 +994,7 @@ function toggleDwell(){
     .classList.toggle('visible', dwellMode);
 }
 
-function setSpeed(btn){
+
 
   document.querySelectorAll('.speed-btn')
     .forEach(b => b.classList.remove('active'));
@@ -1038,7 +1010,7 @@ function applyDwell(el, callback){
 
   el.addEventListener('mouseenter', () => {
 
-   if(!dwellMode && !players[currentPlayer]?.dwellMode) return;
+if(!players[currentPlayer]?.eyeTracking) return;
 
     const ring = el.querySelector('.dwell-ring');
 
@@ -1185,25 +1157,7 @@ function buildNames(){
     eyeRow.appendChild(eyeCheck);
     eyeRow.appendChild(eyeLabel);
 
-    /* dwell */
-    const dwellRow = document.createElement('div');
 
-    dwellRow.style.marginTop = '4px';
-
-    const dwellCheck = document.createElement('input');
-
-    dwellCheck.type = 'checkbox';
-    dwellCheck.className = 'dwell-check';
-
-    const dwellLabel = document.createElement('label');
-
-    dwellLabel.textContent = ' Dwell timer';
-
-    dwellRow.appendChild(dwellCheck);
-    dwellRow.appendChild(dwellLabel);
-
-    wrapper.appendChild(inp);
-    wrapper.appendChild(eyeRow);
     wrapper.appendChild(dwellRow);
 
     el.appendChild(wrapper);
@@ -1223,13 +1177,8 @@ players = wrappers.map((wrap, i) => ({
 
   tiles:[],
 
-  eyeTracking:
-    wrap.querySelector('.eye-check').checked,
-
-  dwellMode:
-    wrap.querySelector('.dwell-check').checked,
-
-  dwellDuration:1500
+eyeTracking:
+  wrap.querySelector('.eye-check').checked
 
 }));
 
@@ -1923,10 +1872,7 @@ function checkEyeHover(ex, ey){
 
  const player = players[currentPlayer];
 
-if(
-  !player?.eyeTracking ||
-  !player?.dwellMode
-) return;
+if(!player?.eyeTracking) return;
 
   const elements =
     document.querySelectorAll(
