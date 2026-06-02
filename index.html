@@ -622,6 +622,9 @@ function renderGameOver(){
 let camera;
 let faceMesh;
 
+  let smoothX = window.innerWidth / 2;
+let smoothY = window.innerHeight / 2;
+
   let calibrationMode = false;
 let calibrationStep = 0;
 let calibrationData = [];
@@ -740,22 +743,24 @@ const verticalRatio =
 (iris.y - topLid.y) /
 (bottomLid.y - topLid.y);
 
-let x = eyeRatio;
-let y = verticalRatio;
+let x = 1 - eyeRatio;
+let y = 1 - verticalRatio;
 
 x = Math.max(0, Math.min(1, x));
 y = Math.max(0, Math.min(1, y));
 
-const px = x * window.innerWidth;
-const py = y * window.innerHeight;
+const targetX = x * window.innerWidth;
+const targetY = y * window.innerHeight;
+
+smoothX = smoothX * 0.85 + targetX * 0.15;
+smoothY = smoothY * 0.85 + targetY * 0.15;
 
 const cursor = document.getElementById("eyeCursor");
 
-cursor.style.left = px + "px";
-cursor.style.top = py + "px";
+cursor.style.left = smoothX + "px";
+cursor.style.top = smoothY + "px";
 
-checkEyeHover(px, py);
-}
+checkEyeHover(smoothX, smoothY);
 
 /* ========================= EYE HOVER / DWELL ========================= */
 let eyeHoverElement = null;
