@@ -736,24 +736,40 @@ const eyeRatio =
 (iris.x - leftCorner.x) /
 (rightCorner.x - leftCorner.x);
 
-const topLid = face[159];
-const bottomLid = face[145];
+const iris = face[468];
+
+const leftCorner = face[33];
+const rightCorner = face[133];
+
+const eyeRatio =
+(iris.x - leftCorner.x) /
+(rightCorner.x - leftCorner.x);
+
+const eyeTop = face[27];
+const eyeBottom = face[23];
 
 const verticalRatio =
-(iris.y - topLid.y) /
-(bottomLid.y - topLid.y);
+(iris.y - eyeTop.y) /
+(eyeBottom.y - eyeTop.y);
 
-let x = 1 - eyeRatio;
-let y = 1 - verticalRatio;
+// GEEN spiegeling meer
+let x = eyeRatio;
+let y = verticalRatio;
 
+// gevoeligheid vergroten
+x = (x - 0.35) / 0.30;
+y = (y - 0.35) / 0.30;
+
+// binnen scherm houden
 x = Math.max(0, Math.min(1, x));
 y = Math.max(0, Math.min(1, y));
 
 const targetX = x * window.innerWidth;
 const targetY = y * window.innerHeight;
 
-smoothX = smoothX * 0.85 + targetX * 0.15;
-smoothY = smoothY * 0.85 + targetY * 0.15;
+// minder trillingen
+smoothX = smoothX * 0.92 + targetX * 0.08;
+smoothY = smoothY * 0.92 + targetY * 0.08;
 
 const cursor = document.getElementById("eyeCursor");
 
