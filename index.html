@@ -91,23 +91,13 @@ body{font-family:'Nunito',sans-serif;background:#2a5c38;min-height:100vh;color:#
 .rank-name{font-weight:800;font-size:1.1rem;flex:1;text-align:left;}
 .rank-worms{font-family:'Fredoka One',sans-serif;font-size:1.2rem;}
 #eyeCursor{position:fixed;width:24px;height:24px;border-radius:50%;background:#00e5ff;border:3px solid white;z-index:99999;pointer-events:none;transform:translate(-50%,-50%);}
-#calibrationPoint{
-  position:fixed;
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  background:red;
-  z-index:999999;
-  display:none;
-  transform:translate(-50%,-50%);
-}  
 @keyframes rollAnim{0%{transform:rotate(0) scale(1)}20%{transform:rotate(-14deg) scale(1.12)}50%{transform:rotate(10deg) scale(1.08)}80%{transform:rotate(-5deg) scale(1.1)}100%{transform:rotate(0) scale(1)}}
 .die.rolling{animation:rollAnim .45s ease;}
 </style>
 </head>
 <body>
 <div id="eyeCursor"></div>
-<div id="calibrationPoint"></div>
+
 <!-- SETUP -->
 <div id="setup" class="screen active">
   <div class="logo-worm">🐛</div>
@@ -522,16 +512,7 @@ function renderTiles(){
   tableTiles.forEach(t => {
     const d = document.createElement('div');
     d.className = 'tile';
-    d.innerHTML = `
-<div class="tile-n">${t}</div>
-<div class="tile-w">🐛${wormValue(t)}</div>
-<div class="dwell-ring"></div>
-`;
-    d.style.cursor = "pointer";
-
-d.onclick = () => manualTakeTile(t);
-
-applyDwell(d, () => manualTakeTile(t));
+    d.innerHTML = `<div class="tile-n">${t}</div><div class="tile-w">🐛${wormValue(t)}</div>`;
     el.appendChild(d);
   });
 }
@@ -622,26 +603,6 @@ function renderGameOver(){
 let camera;
 let faceMesh;
 
-  let smoothX = window.innerWidth / 2;
-let smoothY = window.innerHeight / 2;
-
-  let calibrationMode = false;
-let calibrationStep = 0;
-let calibrationData = [];
-
-const calibrationPoints = [
-  {x:0.1,y:0.1},
-  {x:0.5,y:0.1},
-  {x:0.9,y:0.1},
-
-  {x:0.1,y:0.5},
-  {x:0.5,y:0.5},
-  {x:0.9,y:0.5},
-
-  {x:0.1,y:0.9},
-  {x:0.5,y:0.9},
-  {x:0.9,y:0.9}
-];
 function startTracking(){
   if(eyeEnabled) return;
   eyeEnabled = true;
@@ -664,119 +625,26 @@ function startTracking(){
     width:640, height:480
   });
   camera.start();
- setTimeout(() => {
-  startCalibration();
-}, 2000);
-}
-  function startCalibration(){
-
-  calibrationMode = true;
-  calibrationStep = 0;
-  calibrationData = [];
-
-  showCalibrationPoint();
-}
-
-function showCalibrationPoint(){
-
-  if(calibrationStep >= calibrationPoints.length){
-
-    calibrationMode = false;
-
-    document.getElementById("calibrationPoint").style.display = "none";
-
-    alert("Kalibratie voltooid");
-
-    return;
-  }
-
-  const point = calibrationPoints[calibrationStep];
-
-  const dot = document.getElementById("calibrationPoint");
-
-  dot.style.display = "block";
-
-  dot.style.left = (point.x * window.innerWidth) + "px";
-  dot.style.top = (point.y * window.innerHeight) + "px";
 }
 
 function onFaceResults(results){
   if(!results.multiFaceLandmarks?.length) return;
-
   const face = results.multiFaceLandmarks[0];
-
-  if(calibrationMode){
-
-    const leftEyeOuter = face[33];
-    const leftEyeInner = face[133];
-    const iris = face[468];
-
-    const ratio =
-      (iris.x - leftEyeOuter.x) /
-      (leftEyeInner.x - leftEyeOuter.x);
-
-    calibrationData.push({
-      ratio,
-      screenX: calibrationPoints[calibrationStep].x,
-      screenY: calibrationPoints[calibrationStep].y
-    });
-
-    calibrationStep++;
-
-    showCalibrationPoint();
-
-    return;
-  }
-const iris = face[468];
-
-const leftCorner = face[33];
-const rightCorner = face[133];
-
-const eyeRatio =
-(iris.x - leftCorner.x) /
-(rightCorner.x - leftCorner.x);
-
-const iris = face[468];
-
-const leftCorner = face[33];
-const rightCorner = face[133];
-
-const eyeRatio =
-(iris.x - leftCorner.x) /
-(rightCorner.x - leftCorner.x);
-
-const eyeTop = face[27];
-const eyeBottom = face[23];
-
-const verticalRatio =
-(iris.y - eyeTop.y) /
-(eyeBottom.y - eyeTop.y);
-
-// GEEN spiegeling meer
-let x = eyeRatio;
-let y = verticalRatio;
-
-// gevoeligheid vergroten
-x = (x - 0.35) / 0.30;
-y = (y - 0.35) / 0.30;
-
-// binnen scherm houden
-x = Math.max(0, Math.min(1, x));
-y = Math.max(0, Math.min(1, y));
-
-const targetX = x * window.innerWidth;
-const targetY = y * window.innerHeight;
-
-// minder trillingen
-smoothX = smoothX * 0.92 + targetX * 0.08;
-smoothY = smoothY * 0.92 + targetY * 0.08;
-
-const cursor = document.getElementById("eyeCursor");
-
-cursor.style.left = smoothX + "px";
-cursor.style.top = smoothY + "px";
-
-checkEyeHover(smoothX, smoothY);
+  const irisL = face[468];
+  const irisR = face[473];
+  let x = 1 - ((irisL.x + irisR.x) / 2);
+  let y = ((irisL.y + irisR.y) / 2);
+  x = (x - 0.5) * 5 + 0.5;
+  y = (y - 0.5) * 8 + 0.5;
+  x = Math.max(0, Math.min(1, x));
+  y = Math.max(0, Math.min(1, y));
+  const px = x * window.innerWidth;
+  const py = y * window.innerHeight;
+  const cursor = document.getElementById("eyeCursor");
+  cursor.style.left = px + "px";
+  cursor.style.top = py + "px";
+  checkEyeHover(px, py);
+}
 
 /* ========================= EYE HOVER / DWELL ========================= */
 let eyeHoverElement = null;
@@ -828,24 +696,6 @@ function updateAccessibility(){
   const cursor = document.getElementById("eyeCursor");
   // Show cursor only if global eye tracking is on AND current player uses it
   cursor.style.display = (eyeEnabled && player?.eyeTracking) ? "block" : "none";
-}
-
-  function manualTakeTile(tile){
-
-  if(!players[currentPlayer]) return;
-
-  tableTiles = tableTiles.filter(t => t !== tile);
-
-  players[currentPlayer].tiles.push(tile);
-
-  renderAll();
-
-  showOverlay(
-    '🎉',
-    'Tegel toegevoegd',
-    `${players[currentPlayer].name} krijgt tegel ${tile}`,
-    nextTurn
-  );
 }
 </script>
 </body>
