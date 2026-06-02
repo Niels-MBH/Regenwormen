@@ -724,20 +724,37 @@ function onFaceResults(results){
 
     return;
   }
-  const irisL = face[468];
-  const irisR = face[473];
-  let x = 1 - ((irisL.x + irisR.x) / 2);
-  let y = ((irisL.y + irisR.y) / 2);
-  x = (x - 0.5) * 5 + 0.5;
-  y = (y - 0.5) * 8 + 0.5;
-  x = Math.max(0, Math.min(1, x));
-  y = Math.max(0, Math.min(1, y));
-  const px = x * window.innerWidth;
-  const py = y * window.innerHeight;
-  const cursor = document.getElementById("eyeCursor");
-  cursor.style.left = px + "px";
-  cursor.style.top = py + "px";
-  checkEyeHover(px, py);
+const iris = face[468];
+
+const leftCorner = face[33];
+const rightCorner = face[133];
+
+const eyeRatio =
+(iris.x - leftCorner.x) /
+(rightCorner.x - leftCorner.x);
+
+const topLid = face[159];
+const bottomLid = face[145];
+
+const verticalRatio =
+(iris.y - topLid.y) /
+(bottomLid.y - topLid.y);
+
+let x = eyeRatio;
+let y = verticalRatio;
+
+x = Math.max(0, Math.min(1, x));
+y = Math.max(0, Math.min(1, y));
+
+const px = x * window.innerWidth;
+const py = y * window.innerHeight;
+
+const cursor = document.getElementById("eyeCursor");
+
+cursor.style.left = px + "px";
+cursor.style.top = py + "px";
+
+checkEyeHover(px, py);
 }
 
 /* ========================= EYE HOVER / DWELL ========================= */
