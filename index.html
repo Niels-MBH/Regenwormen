@@ -512,7 +512,16 @@ function renderTiles(){
   tableTiles.forEach(t => {
     const d = document.createElement('div');
     d.className = 'tile';
-    d.innerHTML = `<div class="tile-n">${t}</div><div class="tile-w">🐛${wormValue(t)}</div>`;
+    d.innerHTML = `
+<div class="tile-n">${t}</div>
+<div class="tile-w">🐛${wormValue(t)}</div>
+<div class="dwell-ring"></div>
+`;
+    d.style.cursor = "pointer";
+
+d.onclick = () => manualTakeTile(t);
+
+applyDwell(d, () => manualTakeTile(t));
     el.appendChild(d);
   });
 }
@@ -696,6 +705,24 @@ function updateAccessibility(){
   const cursor = document.getElementById("eyeCursor");
   // Show cursor only if global eye tracking is on AND current player uses it
   cursor.style.display = (eyeEnabled && player?.eyeTracking) ? "block" : "none";
+}
+
+  function manualTakeTile(tile){
+
+  if(!players[currentPlayer]) return;
+
+  tableTiles = tableTiles.filter(t => t !== tile);
+
+  players[currentPlayer].tiles.push(tile);
+
+  renderAll();
+
+  showOverlay(
+    '🎉',
+    'Tegel toegevoegd',
+    `${players[currentPlayer].name} krijgt tegel ${tile}`,
+    nextTurn
+  );
 }
 </script>
 </body>
