@@ -91,13 +91,23 @@ body{font-family:'Nunito',sans-serif;background:#2a5c38;min-height:100vh;color:#
 .rank-name{font-weight:800;font-size:1.1rem;flex:1;text-align:left;}
 .rank-worms{font-family:'Fredoka One',sans-serif;font-size:1.2rem;}
 #eyeCursor{position:fixed;width:24px;height:24px;border-radius:50%;background:#00e5ff;border:3px solid white;z-index:99999;pointer-events:none;transform:translate(-50%,-50%);}
+#calibrationPoint{
+  position:fixed;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:red;
+  z-index:999999;
+  display:none;
+  transform:translate(-50%,-50%);
+}  
 @keyframes rollAnim{0%{transform:rotate(0) scale(1)}20%{transform:rotate(-14deg) scale(1.12)}50%{transform:rotate(10deg) scale(1.08)}80%{transform:rotate(-5deg) scale(1.1)}100%{transform:rotate(0) scale(1)}}
 .die.rolling{animation:rollAnim .45s ease;}
 </style>
 </head>
 <body>
 <div id="eyeCursor"></div>
-
+<div id="calibrationPoint"></div>
 <!-- SETUP -->
 <div id="setup" class="screen active">
   <div class="logo-worm">🐛</div>
@@ -612,6 +622,23 @@ function renderGameOver(){
 let camera;
 let faceMesh;
 
+  let calibrationMode = false;
+let calibrationStep = 0;
+let calibrationData = [];
+
+const calibrationPoints = [
+  {x:0.1,y:0.1},
+  {x:0.5,y:0.1},
+  {x:0.9,y:0.1},
+
+  {x:0.1,y:0.5},
+  {x:0.5,y:0.5},
+  {x:0.9,y:0.5},
+
+  {x:0.1,y:0.9},
+  {x:0.5,y:0.9},
+  {x:0.9,y:0.9}
+];
 function startTracking(){
   if(eyeEnabled) return;
   eyeEnabled = true;
@@ -634,11 +661,69 @@ function startTracking(){
     width:640, height:480
   });
   camera.start();
+ setTimeout(() => {
+  startCalibration();
+}, 2000);
+}
+  function startCalibration(){
+
+  calibrationMode = true;
+  calibrationStep = 0;
+  calibrationData = [];
+
+  showCalibrationPoint();
+}
+
+function showCalibrationPoint(){
+
+  if(calibrationStep >= calibrationPoints.length){
+
+    calibrationMode = false;
+
+    document.getElementById("calibrationPoint").style.display = "none";
+
+    alert("Kalibratie voltooid");
+
+    return;
+  }
+
+  const point = calibrationPoints[calibrationStep];
+
+  const dot = document.getElementById("calibrationPoint");
+
+  dot.style.display = "block";
+
+  dot.style.left = (point.x * window.innerWidth) + "px";
+  dot.style.top = (point.y * window.innerHeight) + "px";
 }
 
 function onFaceResults(results){
   if(!results.multiFaceLandmarks?.length) return;
+
   const face = results.multiFaceLandmarks[0];
+
+  if(calibrationMode){
+
+    const leftEyeOuter = face[33];
+    const leftEyeInner = face[133];
+    const iris = face[468];
+
+    const ratio =
+      (iris.x - leftEyeOuter.x) /
+      (leftEyeInner.x - leftEyeOuter.x);
+
+    calibrationData.push({
+      ratio,
+      screenX: calibrationPoints[calibrationStep].x,
+      screenY: calibrationPoints[calibrationStep].y
+    });
+
+    calibrationStep++;
+
+    showCalibrationPoint();
+
+    return;
+  }
   const irisL = face[468];
   const irisR = face[473];
   let x = 1 - ((irisL.x + irisR.x) / 2);
