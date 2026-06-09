@@ -1391,38 +1391,32 @@ const sparkleSound = new Audio('sparkle.mp3');
 const popSound = new Audio('pop.mp3');
 const successSound = new Audio('succes.mp3');
 const boingSound = new Audio('boing.mp3');
-  const menuMusic = new Audio('menu-music.mp3');
+ const menuMusic = new Audio('menu-music.mp3');
 menuMusic.loop = true;
 menuMusic.volume = 0.25;
 
 let soundEnabled = true;
+let audioStarted = false;
 
-let audioUnlocked = false;
-
-function tryStartMusic() {
-  if (!soundEnabled || audioUnlocked) return;
-
-  menuMusic.volume = 0.25;
+function startMenuMusic() {
+  if (!soundEnabled || audioStarted) return;
 
   menuMusic.play()
     .then(() => {
-      audioUnlocked = true;
+      audioStarted = true;
     })
     .catch(() => {
-      // geblokkeerd door browser → wachten op klik/tap
+      // nog geblokkeerd → wachten op klik
     });
 }
 
-// proberen zodra site opent
-window.addEventListener('load', tryStartMusic);
+// probeer bij openen
+window.addEventListener("load", startMenuMusic);
 
-// fallback: eerste interactie unlockt audio
-function unlockAudioOnce() {
-  tryStartMusic();
-  document.removeEventListener('pointerdown', unlockAudioOnce);
-}
-
-document.addEventListener('pointerdown', unlockAudioOnce);
+// start bij eerste klik/tap
+document.addEventListener("pointerdown", () => {
+  startMenuMusic();
+}, { once: true });
 /* ========================= PARTICLES ========================= */
 function spawnParticles(x, y, count, colors, emojis) {
   const container = document.getElementById('particles-container');
@@ -1985,7 +1979,9 @@ function updateAccessibility() {
   const isEyePlayer = eyeEnabled && player?.eyeTracking;
   cursor.style.display = isEyePlayer ? 'block' : 'none';
 }
-
+document.addEventListener("click", () => {
+  tryPlayMenuMusic();
+}, { once: true });
 
 
 
