@@ -14,7 +14,25 @@
 :root{
   --sky1:#4ec3f7;
   --sky2:#81d4fa;
-  --grass1:#5cb85c;
+  --grass1:#5cb85c;function toggleSound() {
+    soundEnabled = !soundEnabled;
+
+    if (soundEnabled) {
+        rollSound.muted = false;
+        sparkleSound.muted = false;
+
+        menuMusic.play().catch(err => {
+            console.log("Muziek kon niet starten:", err);
+        });
+
+    } else {
+        rollSound.muted = true;
+        sparkleSound.muted = true;
+
+        menuMusic.pause();
+        menuMusic.currentTime = 0;
+    }
+}
   --grass2:#3d8b3d;
   --dirt1:#8B6914;
   --dirt2:#6B4F0F;
@@ -1900,7 +1918,9 @@ function toggleSound() {
 
   if (soundEnabled) {
     // 🎵 START MENU MUSIC
-    menuMusic.play().catch(() => {});
+    menuMusic.play().catch(err => {
+  console.log("Muziek start fout:", err);
+});
   } else {
     // ⛔ STOP MENU MUSIC
     menuMusic.pause();
