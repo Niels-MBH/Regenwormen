@@ -1401,22 +1401,21 @@ let audioStarted = false;
 function startMenuMusic() {
   if (!soundEnabled || audioStarted) return;
 
-  menuMusic.play()
-    .then(() => {
-      audioStarted = true;
-    })
-    .catch(() => {
-      // nog geblokkeerd → wachten op klik
-    });
+  menuMusic.currentTime = 0;
+  menuMusic.volume = 0.25;
+
+  const playPromise = menuMusic.play();
+
+  if (playPromise !== undefined) {
+    playPromise
+      .then(() => {
+        audioStarted = true;
+      })
+      .catch((err) => {
+        console.log("Music blocked:", err);
+      });
+  }
 }
-
-// probeer bij openen
-window.addEventListener("load", startMenuMusic);
-
-// start bij eerste klik/tap
-document.addEventListener("pointerdown", () => {
-  startMenuMusic();
-}, { once: true });
 /* ========================= PARTICLES ========================= */
 function spawnParticles(x, y, count, colors, emojis) {
   const container = document.getElementById('particles-container');
@@ -1980,7 +1979,7 @@ function updateAccessibility() {
   cursor.style.display = isEyePlayer ? 'block' : 'none';
 }
 document.addEventListener("click", () => {
-  tryPlayMenuMusic();
+  startMenuMusic();
 }, { once: true });
 
 
