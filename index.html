@@ -1391,8 +1391,17 @@ const sparkleSound = new Audio('sparkle.mp3');
 const popSound = new Audio('pop.mp3');
 const successSound = new Audio('succes.mp3');
 const boingSound = new Audio('boing.mp3');
+  const menuMusic = new Audio('menu-music.mp3');
+menuMusic.loop = true;
+menuMusic.volume = 0.25;
 
 let soundEnabled = true;
+
+    function tryPlayMenuMusic() {
+  if (!soundEnabled) return;
+
+  menuMusic.play().catch(() => {});
+}
 
 /* ========================= PARTICLES ========================= */
 function spawnParticles(x, y, count, colors, emojis) {
@@ -1956,6 +1965,15 @@ function updateAccessibility() {
   const isEyePlayer = eyeEnabled && player?.eyeTracking;
   cursor.style.display = isEyePlayer ? 'block' : 'none';
 }
+window.addEventListener('load', tryPlayMenuMusic);
+
+document.addEventListener('click', () => {
+  if (soundEnabled && menuMusic.paused) {
+    menuMusic.play().catch(() => {});
+  }
+}, { once: true });
+
+ 
 </script>
 </body>
 </html>
