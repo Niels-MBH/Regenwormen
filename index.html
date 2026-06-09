@@ -1213,7 +1213,7 @@ body{
     </button>
     <br>
     <button class="big-btn btn-yellow" id="soundBtn" onclick="toggleSound()">
-      🔊 Geluid aan <div class="dwell-ring"></div>
+      🔇 Geluid uit <div class="dwell-ring"></div>
     </button>
     <br>
     <button class="big-btn btn-orange" onclick="showRules()">
@@ -1387,8 +1387,12 @@ function applyDwell(el, callback) {
 /* ========================= AUDIO ========================= */
 const rollSound = new Audio('dice.mp3');
 const sparkleSound = new Audio('sparkle.mp3');
-let soundEnabled = true;
 
+const menuMusic = new Audio('menu-music.mp3');
+menuMusic.loop = true;
+menuMusic.volume = 0.25;
+
+let soundEnabled = false; // 🔇 standaard uit
 /* ========================= PARTICLES ========================= */
 function spawnParticles(x, y, count, colors, emojis) {
   const container = document.getElementById('particles-container');
@@ -1888,8 +1892,18 @@ window.showRules = function () { showScreen('rules'); };
 
 function toggleSound() {
   soundEnabled = !soundEnabled;
+
   const btn = document.getElementById('soundBtn');
-  btn.innerHTML = (soundEnabled ? '🔊 Geluid aan' : '🔇 Geluid uit') + '<div class="dwell-ring"></div>';
+  btn.innerHTML =
+    (soundEnabled ? '🔊 Geluid aan' : '🔇 Geluid uit') +
+    '<div class="dwell-ring"></div>';
+
+  if (soundEnabled) {
+    menuMusic.play().catch(() => {});
+  } else {
+    menuMusic.pause();
+    menuMusic.currentTime = 0;
+  }
 }
 
 function updateAccessibility() {
