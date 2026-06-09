@@ -1899,8 +1899,10 @@ function toggleSound() {
     '<div class="dwell-ring"></div>';
 
   if (soundEnabled) {
+    // 🎵 START MENU MUSIC
     menuMusic.play().catch(() => {});
   } else {
+    // ⛔ STOP MENU MUSIC
     menuMusic.pause();
     menuMusic.currentTime = 0;
   }
