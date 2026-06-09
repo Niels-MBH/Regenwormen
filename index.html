@@ -7,208 +7,1194 @@
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 <style>
-@font-face{font-family:'Fredoka One';font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/fredokaone/v15/k3kUo8kEI-tA1RRcTZGmTlHGCac.woff2) format('woff2');}
-@font-face{font-family:'Nunito';font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofINeaB.woff2) format('woff2');}
-@font-face{font-family:'Nunito';font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIO-aBXso.woff2) format('woff2');}
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800;900&display=swap');
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{
-font-family:'Nunito',sans-serif;
-min-height:100vh;
-color:#2c1810;
-overflow-x:hidden;
-background:
-linear-gradient(180deg,#87d7ff 0%,#a9e7ff 35%,#d7f5ff 100%);
-position:relative;
+
+:root{
+  --sky1:#4ec3f7;
+  --sky2:#81d4fa;
+  --grass1:#5cb85c;
+  --grass2:#3d8b3d;
+  --dirt1:#8B6914;
+  --dirt2:#6B4F0F;
+  --gold1:#FFD700;
+  --gold2:#FFA500;
+  --gold3:#c8901a;
+  --worm:#e84393;
+  --cream:#fdf6e3;
+  --brown:#2c1810;
+  --shadow:rgba(0,0,0,0.35);
 }
 
-body::before{
-content:'';
-position:fixed;
-inset:0;
-pointer-events:none;
-background:
-radial-gradient(circle at 15% 20%,rgba(255,255,255,.95) 0 60px,transparent 61px),
-radial-gradient(circle at 22% 18%,rgba(255,255,255,.95) 0 45px,transparent 46px),
-radial-gradient(circle at 70% 12%,rgba(255,255,255,.95) 0 70px,transparent 71px),
-radial-gradient(circle at 78% 10%,rgba(255,255,255,.95) 0 50px,transparent 51px);
-z-index:-2;
+body{
+  font-family:'Nunito',sans-serif;
+  min-height:100vh;
+  color:var(--brown);
+  overflow-x:hidden;
+  background:#4ec3f7;
+  position:relative;
 }
+
+/* ═══════════════════════ WORLD BACKGROUND ═══════════════════════ */
+.world-bg{
+  position:fixed;
+  inset:0;
+  z-index:-10;
+  overflow:hidden;
+  pointer-events:none;
+}
+
+/* Sky gradient */
+.sky-layer{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,
+    #1565c0 0%,
+    #1976d2 15%,
+    #42a5f5 40%,
+    #64b5f6 60%,
+    #aed6f1 80%,
+    #d4e9f7 100%
+  );
+}
+
+/* Sun */
+.sun{
+  position:absolute;
+  top:6%;
+  right:12%;
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  background:radial-gradient(circle,#fff7a1 0%,#ffe066 40%,#ffc300 70%,#ff9900 100%);
+  box-shadow:0 0 60px 30px rgba(255,220,0,0.45), 0 0 120px 60px rgba(255,180,0,0.2);
+  animation:sunPulse 4s ease-in-out infinite;
+}
+@keyframes sunPulse{
+  0%,100%{box-shadow:0 0 60px 30px rgba(255,220,0,0.45),0 0 120px 60px rgba(255,180,0,0.2);}
+  50%{box-shadow:0 0 80px 40px rgba(255,220,0,0.6),0 0 150px 80px rgba(255,180,0,0.3);}
+}
+
+/* Sun rays */
+.sun-rays{
+  position:absolute;
+  top:6%;
+  right:12%;
+  width:90px;
+  height:90px;
+  animation:rotateSun 20s linear infinite;
+}
+.sun-rays::before,.sun-rays::after{
+  content:'';
+  position:absolute;
+  top:50%;left:50%;
+  background:rgba(255,220,0,0.15);
+  transform-origin:0 0;
+}
+.sun-rays::before{
+  width:300px;height:3px;
+  transform:translateY(-50%) rotate(30deg);
+  box-shadow:0 30px 0 3px rgba(255,220,0,0.1), 0 -30px 0 3px rgba(255,220,0,0.1),
+    0 60px 0 3px rgba(255,220,0,0.08), 0 -60px 0 3px rgba(255,220,0,0.08);
+}
+@keyframes rotateSun{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+
+/* Clouds */
+.cloud{
+  position:absolute;
+  background:#fff;
+  border-radius:50px;
+  opacity:0.92;
+  animation:cloudDrift linear infinite;
+  filter:drop-shadow(0 8px 16px rgba(0,0,0,0.1));
+}
+.cloud::before,.cloud::after{
+  content:'';
+  position:absolute;
+  background:#fff;
+  border-radius:50%;
+}
+.cloud-1{top:8%;left:-200px;width:160px;height:55px;animation-duration:55s;animation-delay:-10s;}
+.cloud-1::before{width:80px;height:80px;top:-35px;left:20px;}
+.cloud-1::after{width:60px;height:60px;top:-25px;left:80px;}
+.cloud-2{top:15%;left:-300px;width:220px;height:70px;animation-duration:75s;animation-delay:-30s;opacity:0.8;}
+.cloud-2::before{width:100px;height:100px;top:-45px;left:30px;}
+.cloud-2::after{width:80px;height:80px;top:-35px;left:120px;}
+.cloud-3{top:5%;left:-250px;width:130px;height:45px;animation-duration:45s;animation-delay:-5s;opacity:0.95;}
+.cloud-3::before{width:65px;height:65px;top:-30px;left:15px;}
+.cloud-3::after{width:50px;height:50px;top:-20px;left:65px;}
+.cloud-4{top:22%;left:-180px;width:100px;height:38px;animation-duration:60s;animation-delay:-20s;opacity:0.75;}
+.cloud-4::before{width:55px;height:55px;top:-25px;left:10px;}
+.cloud-4::after{width:40px;height:40px;top:-18px;left:52px;}
+@keyframes cloudDrift{from{transform:translateX(0);}to{transform:translateX(calc(100vw + 400px));}}
+
+/* Far hills (distant, hazy) */
+.hills-far{
+  position:absolute;
+  bottom:30%;
+  left:0;right:0;
+  height:200px;
+  background:
+    radial-gradient(ellipse 300px 160px at 8% 100%, #b5d99c 0%, transparent 100%),
+    radial-gradient(ellipse 400px 200px at 28% 100%, #a8d090 0%, transparent 100%),
+    radial-gradient(ellipse 350px 180px at 52% 100%, #b8dba0 0%, transparent 100%),
+    radial-gradient(ellipse 450px 220px at 75% 100%, #aad192 0%, transparent 100%),
+    radial-gradient(ellipse 300px 160px at 95% 100%, #b0d496 0%, transparent 100%);
+  opacity:0.6;
+}
+
+/* Near hills */
+.hills-near{
+  position:absolute;
+  bottom:22%;
+  left:0;right:0;
+  height:220px;
+  background:
+    radial-gradient(ellipse 380px 200px at 5% 100%, #5cb85c 0%, transparent 100%),
+    radial-gradient(ellipse 500px 240px at 25% 100%, #4caf50 0%, transparent 100%),
+    radial-gradient(ellipse 420px 210px at 48% 100%, #66bb6a 0%, transparent 100%),
+    radial-gradient(ellipse 550px 260px at 70% 100%, #43a047 0%, transparent 100%),
+    radial-gradient(ellipse 380px 200px at 92% 100%, #57b757 0%, transparent 100%);
+}
+
+/* Grass strip */
+.grass-strip{
+  position:absolute;
+  bottom:18%;
+  left:0;right:0;
+  height:80px;
+  background:linear-gradient(180deg,#6dbd6d 0%,#5cb85c 40%,#4caf50 100%);
+  border-radius:60% 60% 0 0 / 40px 40px 0 0;
+}
+
+/* Ground */
+.ground-layer{
+  position:absolute;
+  bottom:0;
+  left:0;right:0;
+  height:22%;
+  background:linear-gradient(180deg,#7bc96f 0%,#5cb85c 8%,#8B6914 12%,#6B4F0F 40%,#5a3e0c 100%);
+}
+
+/* Dirt texture bumps */
+.dirt-bumps{
+  position:absolute;
+  bottom:18%;
+  left:0;right:0;
+  height:30px;
+  background:
+    radial-gradient(ellipse 60px 15px at 5% 60%,#5a3e0c 0%,transparent 100%),
+    radial-gradient(ellipse 80px 20px at 18% 70%,#6B4F0F 0%,transparent 100%),
+    radial-gradient(ellipse 50px 12px at 35% 50%,#5a3e0c 0%,transparent 100%),
+    radial-gradient(ellipse 70px 18px at 55% 65%,#6B4F0F 0%,transparent 100%),
+    radial-gradient(ellipse 60px 15px at 72% 55%,#5a3e0c 0%,transparent 100%),
+    radial-gradient(ellipse 90px 22px at 88% 70%,#6B4F0F 0%,transparent 100%);
+}
+
+/* Grass tufts */
+.grass-tufts{
+  position:absolute;
+  bottom:21%;
+  left:0;right:0;
+  height:25px;
+  background:
+    radial-gradient(ellipse 8px 20px at 3% 100%,#3d8b3d 0%,transparent 100%),
+    radial-gradient(ellipse 8px 22px at 3.8% 100%,#4caf50 0%,transparent 100%),
+    radial-gradient(ellipse 8px 18px at 4.5% 100%,#3d8b3d 0%,transparent 100%),
+    radial-gradient(ellipse 8px 20px at 9% 100%,#4caf50 0%,transparent 100%),
+    radial-gradient(ellipse 8px 24px at 9.8% 100%,#3d8b3d 0%,transparent 100%),
+    radial-gradient(ellipse 8px 19px at 10.5% 100%,#56c156 0%,transparent 100%),
+    radial-gradient(ellipse 8px 21px at 20% 100%,#3d8b3d 0%,transparent 100%),
+    radial-gradient(ellipse 8px 23px at 21% 100%,#4caf50 0%,transparent 100%),
+    radial-gradient(ellipse 8px 20px at 22% 100%,#3d8b3d 0%,transparent 100%),
+    radial-gradient(ellipse 8px 22px at 35% 100%,#4caf50 0%,transparent 100%),
+    radial-gradient(ellipse 8px 20px at 36% 100%,#3d8b3d 0%,transparent 100%),
+    radial-gradient(ellipse 8px 24px at 37% 100%,#56c156 0%,transparent 100%),
+    radial-gradient(ellipse 8px 20px at 50% 100%,#3d8b3d 0%,transparent 100%),
+    radial-gradient(ellipse 8px 22px at 51% 100%,#4caf50 0%,transparent 100%),
+    radial-gradient(ellipse 8px 18px at 52% 100%,#3d8b3d 0%,transparent 100%),
+    radial-gradient(ellipse 8px 21px at 65% 100%,#4caf50 0%,transparent 100%),
+    radial-gradient(ellipse 8px 23px at 66% 100%,#3d8b3d 0%,transparent 100%),
+    radial-gradient(ellipse 8px 20px at 67% 100%,#56c156 0%,transparent 100%),
+    radial-gradient(ellipse 8px 22px at 80% 100%,#3d8b3d 0%,transparent 100%),
+    radial-gradient(ellipse 8px 20px at 81% 100%,#4caf50 0%,transparent 100%),
+    radial-gradient(ellipse 8px 24px at 82% 100%,#3d8b3d 0%,transparent 100%),
+    radial-gradient(ellipse 8px 20px at 94% 100%,#4caf50 0%,transparent 100%),
+    radial-gradient(ellipse 8px 22px at 95% 100%,#3d8b3d 0%,transparent 100%),
+    radial-gradient(ellipse 8px 19px at 96% 100%,#56c156 0%,transparent 100%);
+}
+
+/* Decorations: flowers, mushrooms, rocks */
+.deco{position:absolute;pointer-events:none;}
+
+/* Worm mascots in background */
+.bg-worm{
+  position:absolute;
+  font-size:2rem;
+  opacity:0.15;
+  animation:wormWiggle 3s ease-in-out infinite;
+}
+.bg-worm:nth-child(2){animation-delay:-1s;}
+.bg-worm:nth-child(3){animation-delay:-2s;}
+@keyframes wormWiggle{
+  0%,100%{transform:rotate(-5deg) translateY(0);}
+  50%{transform:rotate(5deg) translateY(-5px);}
+}
+
+/* ═══════════════════════ SCREENS ═══════════════════════ */
 .screen{display:none;}
 .screen.active{display:block;}
-#setup{max-width:560px;margin:0 auto;padding:2rem 1rem;text-align:center;}
-.logo-worm{font-size:3rem;line-height:1;}
-.logo{font-family:'Fredoka One',sans-serif;font-size:3.8rem;color:#f5b731;text-shadow:3px 4px 0 #c8901a;line-height:1;margin-bottom:.2rem;}
-.logo-sub{color:rgba(255,255,255,.65);font-size:1rem;font-weight:700;letter-spacing:.05em;margin-bottom:1.75rem;}
-.card{
-background:#fdf6e3;
-border-radius:24px;
-padding:1.75rem;
-box-shadow:0 15px 35px rgba(0,0,0,.25);
+
+/* ═══════════════════════ SETUP SCREEN ═══════════════════════ */
+#setup{
+  max-width:580px;
+  margin:0 auto;
+  padding:2.5rem 1rem;
+  text-align:center;
+  position:relative;
 }
-.field-label{display:block;text-align:left;font-weight:800;font-size:.82rem;color:#7a4a1e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.55rem;}
-.count-row{display:flex;gap:8px;justify-content:center;margin-bottom:1.4rem;}
-.count-btn{width:52px;height:52px;border-radius:50%;border:3px solid #ddd;background:#fff;font-family:'Fredoka One',sans-serif;font-size:1.4rem;color:#7a4a1e;cursor:pointer;transition:all .15s;}
-.count-btn.active{background:#2ecc71;border-color:#1a9e52;color:#fff;transform:scale(1.1);box-shadow:0 3px 0 #1a9e52;}
-.name-inputs{display:grid;gap:8px;margin-bottom:1.4rem;}
-.name-input{width:100%;padding:12px 14px;border-radius:12px;border:2px solid #e0d8c8;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;color:#2c1810;background:#fff;outline:none;}
-.name-input:focus{border-color:#2ecc71;}
-.big-btn{width:100%;padding:18px 20px;border-radius:18px;border:none;font-family:'Fredoka One',sans-serif;font-size:1.35rem;cursor:pointer;transition:transform .1s,box-shadow .1s,opacity .2s;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:10px;}
-.big-btn:disabled{opacity:.35;cursor:not-allowed;}
-.btn-green{background:#2ecc71;color:#fff;box-shadow:0 4px 0 #1a9e52;}
-.btn-blue{background:#3498db;color:#fff;box-shadow:0 4px 0 #1a6ea8;}
-.btn-orange{background:#e67e22;color:#fff;box-shadow:0 4px 0 #b85a12;}
-.btn-yellow{background:#f5b731;color:#fff;box-shadow:0 4px 0 #c8901a;}
-.big-btn:not(:disabled):hover{transform:translateY(-2px);}
-.big-btn:not(:disabled):active{transform:scale(.97);}
-.dwell-ring{position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:conic-gradient(rgba(0,0,0,.85) 0deg,transparent 0deg);box-shadow:inset 0 0 0 3px rgba(0,0,0,.25),0 0 10px rgba(0,0,0,.25);opacity:1;}
-.dwell-speed-block{margin-top:1.25rem;background:rgba(0,0,0,.25);border-radius:16px;padding:1rem 1.25rem;text-align:left;}
-.dwell-speed-header{font-size:.9rem;font-weight:700;color:#fff;margin-bottom:.4rem;}
+
+.logo-worm{
+  font-size:4rem;
+  line-height:1;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+  animation:logoBounce 2s ease-in-out infinite;
+}
+@keyframes logoBounce{
+  0%,100%{transform:translateY(0) rotate(-3deg);}
+  50%{transform:translateY(-8px) rotate(3deg);}
+}
+
+.logo{
+  font-family:'Fredoka One',sans-serif;
+  font-size:4.5rem;
+  color:#FFD700;
+  text-shadow:
+    4px 5px 0 #c8901a,
+    8px 10px 20px rgba(0,0,0,0.4),
+    0 0 40px rgba(255,200,0,0.3);
+  line-height:1;
+  margin-bottom:.2rem;
+  letter-spacing:2px;
+}
+
+.logo-sub{
+  color:rgba(255,255,255,0.85);
+  font-size:1rem;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-shadow:0 2px 6px rgba(0,0,0,0.4);
+  margin-bottom:2rem;
+  text-transform:uppercase;
+}
+
+/* Setup card */
+.card{
+  background:linear-gradient(160deg,#fffef5 0%,#fdf6e3 60%,#fbefd0 100%);
+  border-radius:28px;
+  padding:2rem 1.75rem;
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.35),
+    0 0 0 3px rgba(255,215,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+  border:2px solid rgba(255,215,0,0.4);
+  position:relative;
+  overflow:hidden;
+}
+.card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:4px;
+  background:linear-gradient(90deg,#FFD700,#FFA500,#FF6B35,#FFA500,#FFD700);
+  background-size:200% 100%;
+  animation:shimmerBar 3s linear infinite;
+}
+@keyframes shimmerBar{from{background-position:0% 0;}to{background-position:200% 0;}}
+
+.field-label{
+  display:block;
+  text-align:left;
+  font-weight:900;
+  font-size:.78rem;
+  color:#8B5E0A;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  margin-bottom:.6rem;
+}
+
+.count-row{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin-bottom:1.5rem;
+}
+
+.count-btn{
+  width:56px;height:56px;
+  border-radius:50%;
+  border:3px solid #e0c870;
+  background:linear-gradient(180deg,#fff8e1,#fff3b0);
+  font-family:'Fredoka One',sans-serif;
+  font-size:1.5rem;
+  color:#8B5E0A;
+  cursor:pointer;
+  transition:all .18s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 4px 0 #c8901a, 0 6px 12px rgba(0,0,0,0.2);
+  position:relative;
+}
+.count-btn:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 7px 0 #c8901a,0 10px 20px rgba(0,0,0,0.25);}
+.count-btn.active{
+  background:linear-gradient(180deg,#66d97d,#2ecc71);
+  border-color:#1a9e52;
+  color:#fff;
+  transform:scale(1.12);
+  box-shadow:0 4px 0 #1a9e52, 0 8px 20px rgba(46,204,113,0.4);
+}
+
+.name-inputs{display:grid;gap:10px;margin-bottom:1.5rem;}
+
+.player-setup{
+  background:linear-gradient(135deg,#fff9f0,#fff3d0);
+  padding:14px 16px;
+  border-radius:16px;
+  border:2px solid rgba(255,215,0,0.3);
+  box-shadow:0 3px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+  transition:border-color .2s;
+}
+.player-setup:focus-within{border-color:rgba(255,180,0,0.6);}
+
+.name-input{
+  width:100%;
+  padding:10px 14px;
+  border-radius:10px;
+  border:2px solid #e0d8c8;
+  font-family:'Nunito',sans-serif;
+  font-size:1rem;
+  font-weight:700;
+  color:var(--brown);
+  background:#fff;
+  outline:none;
+  transition:border-color .2s, box-shadow .2s;
+}
+.name-input:focus{border-color:#FFD700;box-shadow:0 0 0 3px rgba(255,215,0,0.2);}
+
+/* Big buttons */
+.big-btn{
+  width:100%;
+  padding:16px 20px;
+  border-radius:18px;
+  border:none;
+  font-family:'Fredoka One',sans-serif;
+  font-size:1.3rem;
+  cursor:pointer;
+  transition:transform .12s cubic-bezier(.34,1.56,.64,1), box-shadow .12s;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  letter-spacing:.5px;
+  margin-bottom:2px;
+}
+.big-btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important;}
+.big-btn:not(:disabled):hover{transform:translateY(-3px);}
+.big-btn:not(:disabled):active{transform:scale(.97) translateY(0);}
+
+.big-btn::after{
+  content:'';
+  position:absolute;
+  top:0;left:-100%;
+  width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);
+  animation:btnShimmer 3s ease-in-out infinite;
+}
+@keyframes btnShimmer{
+  0%{left:-100%;}60%,100%{left:150%;}
+}
+
+.btn-green{
+  background:linear-gradient(180deg,#4cd964,#2ecc71,#25a659);
+  color:#fff;
+  box-shadow:0 5px 0 #1a9e52, 0 8px 20px rgba(46,204,113,0.4);
+  text-shadow:0 1px 3px rgba(0,0,0,0.2);
+}
+.btn-green:not(:disabled):hover{box-shadow:0 8px 0 #1a9e52, 0 12px 25px rgba(46,204,113,0.5);}
+.btn-green:not(:disabled):active{box-shadow:0 2px 0 #1a9e52;}
+
+.btn-blue{
+  background:linear-gradient(180deg,#54a0ff,#3498db,#2176ae);
+  color:#fff;
+  box-shadow:0 5px 0 #1a6ea8, 0 8px 20px rgba(52,152,219,0.4);
+  text-shadow:0 1px 3px rgba(0,0,0,0.2);
+}
+.btn-blue:not(:disabled):hover{box-shadow:0 8px 0 #1a6ea8, 0 12px 25px rgba(52,152,219,0.5);}
+.btn-blue:not(:disabled):active{box-shadow:0 2px 0 #1a6ea8;}
+
+.btn-orange{
+  background:linear-gradient(180deg,#f9a825,#e67e22,#c56a10);
+  color:#fff;
+  box-shadow:0 5px 0 #b85a12, 0 8px 20px rgba(230,126,34,0.4);
+  text-shadow:0 1px 3px rgba(0,0,0,0.2);
+}
+.btn-orange:not(:disabled):hover{box-shadow:0 8px 0 #b85a12, 0 12px 25px rgba(230,126,34,0.5);}
+.btn-orange:not(:disabled):active{box-shadow:0 2px 0 #b85a12;}
+
+.btn-yellow{
+  background:linear-gradient(180deg,#ffe249,#f5b731,#d4960f);
+  color:#7a4a00;
+  box-shadow:0 5px 0 #c8901a, 0 8px 20px rgba(245,183,49,0.4);
+  text-shadow:0 1px 2px rgba(255,255,255,0.3);
+}
+.btn-yellow:not(:disabled):hover{box-shadow:0 8px 0 #c8901a, 0 12px 25px rgba(245,183,49,0.5);}
+.btn-yellow:not(:disabled):active{box-shadow:0 2px 0 #c8901a;}
+
+.btn-red{
+  background:linear-gradient(180deg,#ff6b6b,#e74c3c,#c0392b);
+  color:#fff;
+  box-shadow:0 5px 0 #922b21, 0 8px 20px rgba(231,76,60,0.4);
+  text-shadow:0 1px 3px rgba(0,0,0,0.2);
+}
+.btn-red:not(:disabled):hover{box-shadow:0 8px 0 #922b21, 0 12px 25px rgba(231,76,60,0.5);}
+.btn-red:not(:disabled):active{box-shadow:0 2px 0 #922b21;}
+
+/* Dwell ring */
+.dwell-ring{
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  background:conic-gradient(rgba(255,255,255,0.6) 0deg,transparent 0deg);
+  opacity:1;
+}
+
+/* Speed block */
+.dwell-speed-block{
+  margin-top:1.25rem;
+  background:rgba(139,94,10,0.12);
+  border-radius:14px;
+  padding:1rem 1.25rem;
+  text-align:left;
+  border:1px solid rgba(200,144,26,0.3);
+}
+.dwell-speed-header{font-size:.9rem;font-weight:800;color:#8B5E0A;margin-bottom:.5rem;}
 .speed-row{display:flex;gap:8px;flex-wrap:wrap;}
-.speed-btn{padding:4px 12px;border-radius:20px;border:2px solid rgba(255,255,255,.3);background:transparent;color:rgba(255,255,255,.65);font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;}
-.speed-btn.active{background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.7);}
-#game{max-width:940px;margin:0 auto;padding:.75rem;display:flex;flex-direction:column;gap:.75rem;}
-.g-header{background:rgba(0,0,0,.35);border-radius:18px;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.gh-label{font-size:.72rem;color:rgba(255,255,255,.6);font-weight:700;}
-.gh-name{font-family:'Fredoka One',sans-serif;font-size:1.6rem;color:#fff;}
+.speed-btn{
+  padding:5px 14px;
+  border-radius:20px;
+  border:2px solid rgba(139,94,10,0.3);
+  background:transparent;
+  color:#8B5E0A;
+  font-family:'Nunito',sans-serif;
+  font-size:.82rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .15s;
+}
+.speed-btn.active{background:rgba(255,183,0,0.2);color:#6B4500;border-color:rgba(200,144,26,0.7);}
+
+/* ═══════════════════════ RULES SCREEN ═══════════════════════ */
+#rules{max-width:600px;margin:0 auto;padding:2rem 1rem;text-align:center;}
+#rules .card{text-align:left;line-height:1.7;font-size:.95rem;}
+#rules h3{
+  font-family:'Fredoka One',sans-serif;
+  color:#FFD700;
+  text-shadow:1px 2px 0 #c8901a;
+  font-size:1.3rem;
+  margin-top:1.2rem;
+  margin-bottom:.4rem;
+}
+#rules h3:first-child{margin-top:0;}
+
+/* ═══════════════════════ GAME SCREEN ═══════════════════════ */
+#game{
+  max-width:980px;
+  margin:0 auto;
+  padding:.75rem;
+  display:flex;
+  flex-direction:column;
+  gap:.85rem;
+}
+
+/* Game Header */
+.g-header{
+  background:linear-gradient(135deg,
+    rgba(10,30,80,0.88) 0%,
+    rgba(15,50,120,0.82) 50%,
+    rgba(10,30,80,0.88) 100%
+  );
+  border-radius:20px;
+  padding:14px 22px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  border:2px solid rgba(255,215,0,0.35);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.1),
+    0 0 0 1px rgba(255,215,0,0.1);
+  backdrop-filter:blur(8px);
+  position:relative;
+  overflow:hidden;
+}
+.g-header::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,rgba(255,215,0,0.8),rgba(255,140,0,0.6),rgba(255,215,0,0.8),transparent);
+}
+
+.gh-label{
+  font-size:.68rem;
+  color:rgba(255,255,255,0.55);
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  margin-bottom:2px;
+}
+.gh-name{
+  font-family:'Fredoka One',sans-serif;
+  font-size:1.8rem;
+  color:#fff;
+  text-shadow:0 2px 8px rgba(0,0,0,0.4);
+  line-height:1;
+}
 .gh-mid{text-align:center;}
-.gh-score{font-family:'Fredoka One',sans-serif;font-size:2.6rem;color:#f5b731;}
-.gh-right{text-align:right;font-family:'Fredoka One',sans-serif;font-size:1.2rem;color:#fff;}
-.g-section{background:rgba(0,0,0,.2);border-radius:16px;padding:12px 14px;}
-.sec-label{font-size:.72rem;font-weight:800;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
-.tile-row{display:flex;flex-wrap:wrap;gap:6px;min-height:72px;}
+.gh-score{
+  font-family:'Fredoka One',sans-serif;
+  font-size:3rem;
+  color:#FFD700;
+  text-shadow:0 3px 0 #c8901a, 0 6px 20px rgba(255,200,0,0.4);
+  line-height:1;
+}
+.gh-right{text-align:right;}
+.gh-worm-count{
+  font-family:'Fredoka One',sans-serif;
+  font-size:1.4rem;
+  color:#ff9ff3;
+  text-shadow:0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* Section containers */
+.g-section{
+  background:linear-gradient(160deg,
+    rgba(10,30,80,0.75) 0%,
+    rgba(15,50,120,0.65) 100%
+  );
+  border-radius:18px;
+  padding:14px 16px;
+  border:1px solid rgba(255,215,0,0.2);
+  box-shadow:0 6px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+  backdrop-filter:blur(6px);
+}
+
+.sec-label{
+  font-size:.7rem;
+  font-weight:900;
+  color:rgba(255,255,255,0.55);
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  margin-bottom:10px;
+}
+
+/* ═══════════════════════ TILES ═══════════════════════ */
+.tile-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  min-height:82px;
+  align-items:flex-end;
+}
+
 .tile{
-width:52px;
-height:70px;
-border-radius:14px;
-border:3px solid #fff4b5;
-background:linear-gradient(180deg,#ffd95a,#f5b731);
-box-shadow:
-0 8px 0 #c8901a,
-0 12px 20px rgba(0,0,0,.25);
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-cursor:pointer;
-transition:all .15s ease;
-user-select:none;
+  width:56px;
+  height:76px;
+  border-radius:14px;
+  border:3px solid #ffe066;
+  background:linear-gradient(160deg,#fff9a0 0%,#ffe033 30%,#f5b731 65%,#e8980a 100%);
+  box-shadow:
+    0 8px 0 #c8901a,
+    0 12px 24px rgba(0,0,0,0.35),
+    inset 0 2px 0 rgba(255,255,255,0.7),
+    inset 0 -2px 4px rgba(0,0,0,0.1);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s;
+  user-select:none;
+  position:relative;
+  overflow:hidden;
+  animation:tileAppear .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes tileAppear{
+  0%{transform:scale(0) rotate(-10deg);opacity:0;}
+  100%{transform:scale(1) rotate(0);opacity:1;}
+}
+.tile::before{
+  content:'';
+  position:absolute;
+  top:3px;left:4px;right:4px;
+  height:30%;
+  border-radius:8px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.6),transparent);
+  pointer-events:none;
+}
+.tile::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:11px;
+  background:linear-gradient(135deg,rgba(255,255,255,0.15) 0%,transparent 50%);
+  pointer-events:none;
 }
 .tile:hover{
-transform:translateY(-8px) scale(1.12) rotate(-2deg);
+  transform:translateY(-10px) scale(1.15) rotate(-2deg);
+  box-shadow:
+    0 16px 0 #c8901a,
+    0 22px 35px rgba(0,0,0,0.45),
+    0 0 30px rgba(255,215,0,0.4),
+    inset 0 2px 0 rgba(255,255,255,0.7);
 }
-.tile-n{font-family:'Fredoka One',sans-serif;font-size:1.3rem;}
-.tile-w{font-size:.8rem;font-weight:800;}
-.dice-card{background:#fdf6e3;border-radius:20px;padding:16px;}
-.instruction{text-align:center;font-size:.9rem;font-weight:700;color:#7a4a1e;background:rgba(245,183,49,.2);border-radius:10px;padding:7px 12px;margin-bottom:12px;}
-.sec-label-dark{font-size:.72rem;font-weight:800;color:rgba(44,24,16,.45);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
-.dice-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:100px;align-items:center;margin-bottom:12px;}
+.tile:active{transform:scale(0.95);}
+.tile-n{
+  font-family:'Fredoka One',sans-serif;
+  font-size:1.35rem;
+  color:#5a3200;
+  text-shadow:0 1px 2px rgba(255,255,255,0.5);
+  line-height:1;
+  margin-bottom:2px;
+}
+.tile-w{
+  font-size:.85rem;
+  font-weight:900;
+  color:#6B3500;
+}
+
+/* ═══════════════════════ DICE CARD ═══════════════════════ */
+.dice-card{
+  background:linear-gradient(160deg,#fffef5 0%,#fdf6e3 60%,#f9f0d0 100%);
+  border-radius:22px;
+  padding:18px 18px 16px;
+  box-shadow:
+    0 10px 40px rgba(0,0,0,0.3),
+    0 0 0 2px rgba(255,215,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+  border:2px solid rgba(255,215,0,0.35);
+  position:relative;
+  overflow:hidden;
+}
+.dice-card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:3px;
+  background:linear-gradient(90deg,#FFD700,#FFA500,#FFD700);
+}
+
+.instruction{
+  text-align:center;
+  font-size:.9rem;
+  font-weight:800;
+  color:#6B3500;
+  background:linear-gradient(135deg,rgba(255,200,0,0.15),rgba(255,160,0,0.1));
+  border-radius:12px;
+  padding:8px 14px;
+  margin-bottom:14px;
+  border:1px solid rgba(255,180,0,0.25);
+}
+
+.sec-label-dark{
+  font-size:.7rem;
+  font-weight:900;
+  color:rgba(107,53,0,0.5);
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  margin-bottom:8px;
+}
+
+/* Dice row */
+.dice-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  justify-content:center;
+  min-height:100px;
+  align-items:center;
+  margin-bottom:14px;
+}
+
 .die{
-width:90px;
-height:90px;
-border-radius:20px;
-border:3px solid #fff;
-background:linear-gradient(180deg,#fffef5,#fff2b6);
-display:flex;
-align-items:center;
-justify-content:center;
-font-family:'Fredoka One',sans-serif;
-font-size:2.3rem;
-cursor:pointer;
-position:relative;
-overflow:hidden;
-user-select:none;
-transition:.12s;
-box-shadow:
-inset 0 2px 10px rgba(255,255,255,.9),
-0 10px 18px rgba(0,0,0,.18);
+  width:88px;
+  height:88px;
+  border-radius:20px;
+  border:3px solid rgba(255,255,255,0.9);
+  background:linear-gradient(145deg,#fffef8,#fff8d6,#ffe680);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Fredoka One',sans-serif;
+  font-size:2.4rem;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  user-select:none;
+  transition:transform .15s cubic-bezier(.34,1.56,.64,1), box-shadow .15s;
+  box-shadow:
+    inset 0 3px 8px rgba(255,255,255,0.95),
+    inset 0 -3px 8px rgba(0,0,0,0.12),
+    0 8px 0 rgba(180,140,0,0.5),
+    0 12px 24px rgba(0,0,0,0.25);
+  color:#5a3200;
+  text-shadow:0 1px 2px rgba(0,0,0,0.15);
 }
-.die:hover{transform:translateY(-5px);}
-.die.used{opacity:0.6;filter:grayscale(1) brightness(0.6);cursor:not-allowed;position:relative;transform:none !important;box-shadow:none !important;}
-.die.used::after{content:'✖';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2rem;color:rgba(0,0,0,.4);font-weight:900;background:rgba(0,0,0,.15);border-radius:inherit;}
-.chosen-area{display:flex;flex-wrap:wrap;gap:8px;min-height:72px;align-items:center;background:rgba(46,204,113,.09);border:2px dashed rgba(46,204,113,.4);border-radius:14px;padding:8px;margin-bottom:12px;}
-.c-die{width:70px;height:70px;border-radius:12px;border:2px solid #2ecc71;background:#d4f5e3;display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',sans-serif;font-size:1.9rem;}
-.action-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.players-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;}
+.die::before{
+  content:'';
+  position:absolute;
+  top:4px;left:5px;right:5px;
+  height:35%;
+  border-radius:10px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.7),transparent);
+  pointer-events:none;
+}
+.die:hover{
+  transform:translateY(-8px) scale(1.1);
+  box-shadow:
+    inset 0 3px 8px rgba(255,255,255,0.95),
+    inset 0 -3px 8px rgba(0,0,0,0.12),
+    0 14px 0 rgba(180,140,0,0.5),
+    0 20px 35px rgba(0,0,0,0.35),
+    0 0 25px rgba(255,200,0,0.3);
+}
+.die:active{transform:scale(0.93);}
+
+.die.used{
+  opacity:0.45;
+  filter:grayscale(0.8) brightness(0.7);
+  cursor:not-allowed;
+  transform:none!important;
+  box-shadow:0 4px 0 rgba(100,100,100,0.3),0 6px 12px rgba(0,0,0,0.2)!important;
+}
+.die.used::after{
+  content:'✖';
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:2rem;
+  color:rgba(0,0,0,0.4);
+  font-weight:900;
+  background:rgba(0,0,0,0.15);
+  border-radius:inherit;
+}
+
+/* Roll animation */
+@keyframes rollAnim{
+  0%{transform:rotate(0) scale(1);}
+  15%{transform:rotate(-18deg) scale(1.15) translateY(-10px);}
+  35%{transform:rotate(14deg) scale(1.1) translateY(-6px);}
+  55%{transform:rotate(-8deg) scale(1.12) translateY(-8px);}
+  75%{transform:rotate(5deg) scale(1.08) translateY(-3px);}
+  90%{transform:rotate(-2deg) scale(1.03);}
+  100%{transform:rotate(0) scale(1);}
+}
+.die.rolling{animation:rollAnim .55s cubic-bezier(.23,1,.32,1);}
+
+/* Chosen area */
+.chosen-area{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  min-height:78px;
+  align-items:center;
+  background:linear-gradient(135deg,rgba(46,204,113,0.08),rgba(46,204,113,0.04));
+  border:2px dashed rgba(46,204,113,0.4);
+  border-radius:16px;
+  padding:10px 12px;
+  margin-bottom:14px;
+  position:relative;
+}
+.chosen-area-empty-hint{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:rgba(46,204,113,0.4);
+  font-size:.85rem;
+  font-weight:800;
+  pointer-events:none;
+}
+
+.c-die{
+  width:68px;
+  height:68px;
+  border-radius:14px;
+  border:3px solid #2ecc71;
+  background:linear-gradient(145deg,#eafff2,#c8f7da);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Fredoka One',sans-serif;
+  font-size:1.85rem;
+  color:#1a7a3a;
+  box-shadow:
+    inset 0 2px 6px rgba(255,255,255,0.8),
+    0 4px 0 rgba(26,158,82,0.4),
+    0 6px 12px rgba(46,204,113,0.2);
+  animation:chosenBounce .35s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes chosenBounce{
+  0%{transform:scale(0) rotate(-15deg);}
+  100%{transform:scale(1) rotate(0);}
+}
+
+/* Action row */
+.action-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+/* ═══════════════════════ PLAYERS GRID ═══════════════════════ */
+.players-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:10px;
+}
+
 .p-card{
-background:linear-gradient(
-180deg,
-rgba(255,255,255,.18),
-rgba(0,0,0,.18)
-);
-backdrop-filter:blur(6px);
-border-radius:18px;
-padding:12px;
-border:3px solid transparent;
+  background:linear-gradient(145deg,
+    rgba(15,50,120,0.7) 0%,
+    rgba(10,30,80,0.8) 100%
+  );
+  backdrop-filter:blur(8px);
+  border-radius:18px;
+  padding:14px 14px 12px;
+  border:2px solid rgba(255,255,255,0.1);
+  box-shadow:0 6px 20px rgba(0,0,0,0.3);
+  transition:border-color .2s, transform .2s, box-shadow .2s;
+  position:relative;
+  overflow:hidden;
+  animation:cardIn .4s cubic-bezier(.34,1.56,.64,1) both;
 }
-.p-card.cur{border-color:#f5b731;}
-.p-name{font-family:'Fredoka One',sans-serif;color:#fff;margin-bottom:3px;}
-.p-worms{font-family:'Fredoka One',sans-serif;color:#f5b731;margin-bottom:6px;}
-.p-tile{width:46px;height:60px;border-radius:8px;background:#f5b731;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.p-empty{color:rgba(255,255,255,.28);font-size:.78rem;font-weight:700;}
-.p-stack{color:rgba(255,255,255,.4);font-size:.72rem;font-weight:700;margin-top:3px;}
-#overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;z-index:200;}
+@keyframes cardIn{
+  0%{opacity:0;transform:scale(0.8) translateY(10px);}
+  100%{opacity:1;transform:scale(1) translateY(0);}
+}
+.p-card.cur{
+  border-color:#FFD700;
+  box-shadow:0 8px 30px rgba(0,0,0,0.4), 0 0 20px rgba(255,215,0,0.3);
+}
+.p-card.cur::before{
+  content:'▶ AAN DE BEURT';
+  position:absolute;
+  top:0;left:0;right:0;
+  text-align:center;
+  font-size:.55rem;
+  font-weight:900;
+  letter-spacing:.15em;
+  color:#FFD700;
+  background:rgba(255,215,0,0.15);
+  padding:4px;
+  border-bottom:1px solid rgba(255,215,0,0.2);
+}
+.p-card.cur .p-name{padding-top:18px;}
+
+.p-name{
+  font-family:'Fredoka One',sans-serif;
+  color:#fff;
+  font-size:1.05rem;
+  margin-bottom:4px;
+  text-shadow:0 1px 4px rgba(0,0,0,0.4);
+  line-height:1.2;
+}
+.p-worms{
+  font-family:'Fredoka One',sans-serif;
+  color:#ff9ff3;
+  font-size:1rem;
+  margin-bottom:8px;
+  text-shadow:0 1px 4px rgba(0,0,0,0.3);
+}
+
+.p-tile-wrap{display:flex;align-items:flex-end;gap:8px;}
+.p-tile{
+  width:44px;height:58px;
+  border-radius:8px;
+  background:linear-gradient(160deg,#fff9a0,#ffe033,#f5b731);
+  border:2px solid #ffe066;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  box-shadow:0 4px 0 #c8901a, 0 6px 10px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.6);
+  font-family:'Fredoka One',sans-serif;
+  font-size:.85rem;
+  color:#5a3200;
+}
+.p-empty{
+  color:rgba(255,255,255,0.25);
+  font-size:.78rem;
+  font-weight:800;
+  font-style:italic;
+}
+.p-stack{
+  color:rgba(255,255,255,0.4);
+  font-size:.68rem;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  margin-top:3px;
+}
+
+/* ═══════════════════════ OVERLAY / MODAL ═══════════════════════ */
+#overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,20,0.8);
+  display:none;
+  align-items:center;justify-content:center;
+  z-index:200;
+  backdrop-filter:blur(4px);
+}
 #overlay.show{display:flex;}
-.msg-box{background:#fdf6e3;border-radius:26px;padding:2rem 2.5rem;text-align:center;max-width:380px;width:90%;}
-.msg-icon{font-size:3.8rem;}
-.msg-title{font-family:'Fredoka One',sans-serif;font-size:2rem;margin-bottom:.3rem;}
-.msg-text{font-size:.95rem;color:#666;font-weight:700;line-height:1.5;margin-bottom:1.4rem;}
-.msg-ok{padding:14px 36px;border-radius:14px;border:none;font-family:'Fredoka One',sans-serif;font-size:1.25rem;background:#2ecc71;color:#fff;cursor:pointer;position:relative;overflow:hidden;}
-#gameover{max-width:560px;margin:0 auto;padding:2rem 1rem;text-align:center;}
-.go-title{font-family:'Fredoka One',sans-serif;font-size:3rem;color:#f5b731;margin-bottom:1.5rem;}
-.ranking{display:grid;gap:10px;margin-bottom:1.5rem;}
-.rank-row{background:#fdf6e3;border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:14px;}
-.rank-row.first{background:#f5b731;}
-.rank-pos{font-family:'Fredoka One',sans-serif;font-size:1.6rem;width:40px;}
-.rank-name{font-weight:800;font-size:1.1rem;flex:1;text-align:left;}
-.rank-worms{font-family:'Fredoka One',sans-serif;font-size:1.2rem;}
-/* Eye cursor — only shown when current player has eye tracking */
-#eyeCursor{position:fixed;width:24px;height:24px;border-radius:50%;background:#00e5ff;border:3px solid white;z-index:99999;pointer-events:none;transform:translate(-50%,-50%);display:none;}
-@keyframes rollAnim{0%{transform:rotate(0) scale(1)}20%{transform:rotate(-14deg) scale(1.12)}50%{transform:rotate(10deg) scale(1.08)}80%{transform:rotate(-5deg) scale(1.1)}100%{transform:rotate(0) scale(1)}}
-.die.rolling{animation:rollAnim .45s ease;}
-  @keyframes bounceIn{
-0%{
-transform:scale(.4);
-opacity:0;
+
+.msg-box{
+  background:linear-gradient(160deg,#fffef5,#fdf6e3,#f9edd0);
+  border-radius:28px;
+  padding:2.2rem 2.5rem;
+  text-align:center;
+  max-width:380px;
+  width:90%;
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.6),
+    0 0 0 3px rgba(255,215,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+  border:2px solid rgba(255,215,0,0.5);
+  animation:modalPop .35s cubic-bezier(.34,1.56,.64,1);
+  position:relative;
+  overflow:hidden;
 }
-60%{
-transform:scale(1.15);
+.msg-box::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:4px;
+  background:linear-gradient(90deg,#FFD700,#FFA500,#FF6B35,#FFA500,#FFD700);
 }
-100%{
-transform:scale(1);
-opacity:1;
+@keyframes modalPop{
+  0%{transform:scale(0.5) rotate(-5deg);opacity:0;}
+  100%{transform:scale(1) rotate(0);opacity:1;}
 }
+.msg-icon{font-size:4.5rem;line-height:1;margin-bottom:.3rem;display:block;}
+.msg-title{
+  font-family:'Fredoka One',sans-serif;
+  font-size:2rem;
+  color:#5a3200;
+  margin-bottom:.3rem;
+  text-shadow:1px 2px 0 rgba(0,0,0,0.1);
+}
+.msg-text{
+  font-size:.95rem;
+  color:#8B5E0A;
+  font-weight:700;
+  line-height:1.5;
+  margin-bottom:1.5rem;
+}
+.msg-ok{
+  padding:14px 40px;
+  border-radius:16px;
+  border:none;
+  font-family:'Fredoka One',sans-serif;
+  font-size:1.25rem;
+  background:linear-gradient(180deg,#4cd964,#2ecc71,#25a659);
+  color:#fff;
+  cursor:pointer;
+  box-shadow:0 5px 0 #1a9e52,0 8px 20px rgba(46,204,113,0.35);
+  transition:transform .12s cubic-bezier(.34,1.56,.64,1), box-shadow .12s;
+  position:relative;
+  overflow:hidden;
+  text-shadow:0 1px 3px rgba(0,0,0,0.2);
+}
+.msg-ok:hover{transform:translateY(-3px);box-shadow:0 8px 0 #1a9e52,0 12px 25px rgba(46,204,113,0.45);}
+.msg-ok:active{transform:scale(.97);box-shadow:0 2px 0 #1a9e52;}
+
+/* ═══════════════════════ GAME OVER ═══════════════════════ */
+#gameover{
+  max-width:580px;
+  margin:0 auto;
+  padding:2.5rem 1rem;
+  text-align:center;
 }
 
-.tile,
-.die,
-.p-card{
-animation:bounceIn .35s ease;
+.go-title{
+  font-family:'Fredoka One',sans-serif;
+  font-size:3.5rem;
+  color:#FFD700;
+  text-shadow:4px 5px 0 #c8901a, 0 0 40px rgba(255,200,0,0.4);
+  margin-bottom:2rem;
+  animation:titlePulse 2s ease-in-out infinite;
+}
+@keyframes titlePulse{
+  0%,100%{text-shadow:4px 5px 0 #c8901a,0 0 40px rgba(255,200,0,0.4);}
+  50%{text-shadow:4px 5px 0 #c8901a,0 0 70px rgba(255,200,0,0.6),0 0 20px rgba(255,150,0,0.3);}
 }
 
-#game{
-position:relative;
+.ranking{display:grid;gap:12px;margin-bottom:2rem;}
+
+.rank-row{
+  background:linear-gradient(135deg,#fffef5,#fdf6e3);
+  border-radius:18px;
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.2), 0 0 0 2px rgba(255,215,0,0.2);
+  border:2px solid transparent;
+  transition:transform .2s;
+}
+.rank-row:hover{transform:translateX(4px);}
+.rank-row.first{
+  background:linear-gradient(135deg,#fff9a0,#ffe033,#f5b731);
+  border-color:rgba(200,144,26,0.4);
+  box-shadow:0 8px 30px rgba(255,180,0,0.3), 0 0 0 2px rgba(255,215,0,0.5);
+}
+.rank-pos{font-family:'Fredoka One',sans-serif;font-size:1.8rem;width:44px;text-align:center;}
+.rank-name{font-weight:900;font-size:1.1rem;flex:1;text-align:left;color:#5a3200;}
+.rank-worms{font-family:'Fredoka One',sans-serif;font-size:1.3rem;color:#c8901a;}
+.rank-row.first .rank-worms{color:#6B3500;}
+
+/* ═══════════════════════ EYE CURSOR ═══════════════════════ */
+#eyeCursor{
+  position:fixed;
+  width:26px;height:26px;
+  border-radius:50%;
+  background:radial-gradient(circle,#fff 0%,#00e5ff 60%,transparent 100%);
+  border:3px solid rgba(255,255,255,0.8);
+  z-index:99999;
+  pointer-events:none;
+  transform:translate(-50%,-50%);
+  display:none;
+  box-shadow:0 0 15px rgba(0,229,255,0.8);
 }
 
-#game::before{
-content:'';
-position:fixed;
-left:0;
-right:0;
-bottom:0;
-height:38vh;
-z-index:-1;
-background:
-radial-gradient(circle at 20% 30%,#7bc96f 0 18%,transparent 19%),
-radial-gradient(circle at 50% 20%,#6bbf59 0 15%,transparent 16%),
-radial-gradient(circle at 80% 40%,#86d97b 0 14%,transparent 15%),
-linear-gradient(#7ad66f,#4fa84b);
+/* ═══════════════════════ PARTICLES ═══════════════════════ */
+#particles-container{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:1000;
+  overflow:hidden;
+}
+.particle{
+  position:absolute;
+  border-radius:50%;
+  pointer-events:none;
+  animation:particleFly 1s ease-out forwards;
+}
+@keyframes particleFly{
+  0%{transform:translate(0,0) scale(1);opacity:1;}
+  100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0;}
+}
+.star-particle{
+  position:absolute;
+  pointer-events:none;
+  animation:starFly 1.2s ease-out forwards;
+  font-size:1.5rem;
+}
+@keyframes starFly{
+  0%{transform:translate(0,0) scale(1) rotate(0);opacity:1;}
+  100%{transform:translate(var(--dx),var(--dy)) scale(0) rotate(360deg);opacity:0;}
+}
+
+/* ═══════════════════════ MISC HELPERS ═══════════════════════ */
+.eye-check{margin-right:6px;accent-color:#2ecc71;}
+
+@keyframes bounceIn{
+  0%{transform:scale(.3) rotate(-10deg);opacity:0;}
+  60%{transform:scale(1.15) rotate(2deg);}
+  100%{transform:scale(1) rotate(0);opacity:1;}
+}
+
+/* Score pop */
+.score-pop{
+  position:fixed;
+  font-family:'Fredoka One',sans-serif;
+  font-size:2.2rem;
+  color:#FFD700;
+  text-shadow:2px 3px 0 #c8901a, 0 0 20px rgba(255,200,0,0.6);
+  pointer-events:none;
+  z-index:500;
+  animation:scorePop 1.5s ease-out forwards;
+}
+@keyframes scorePop{
+  0%{transform:scale(0.5) translateY(0);opacity:1;}
+  50%{transform:scale(1.3) translateY(-40px);opacity:1;}
+  100%{transform:scale(1) translateY(-100px);opacity:0;}
+}
+
+/* Worm pop (for stealing) */
+@keyframes wormDance{
+  0%{transform:scale(0) rotate(-20deg);}
+  40%{transform:scale(1.4) rotate(10deg);}
+  70%{transform:scale(0.9) rotate(-5deg);}
+  100%{transform:scale(1) rotate(0);}
+}
+.worm-dance{animation:wormDance .6s cubic-bezier(.34,1.56,.64,1);}
+
+/* Responsive tweaks */
+@media(max-width:600px){
+  .logo{font-size:3rem;}
+  .g-header{flex-wrap:wrap;gap:8px;padding:10px 14px;}
+  .gh-score{font-size:2.2rem;}
+  .die{width:72px;height:72px;font-size:1.9rem;}
+  .tile{width:48px;height:68px;}
+  .action-row{grid-template-columns:1fr;}
 }
 </style>
 </head>
 <body>
+
+<!-- World background -->
+<div class="world-bg">
+  <div class="sky-layer"></div>
+  <div class="sun"></div>
+  <div class="sun-rays"></div>
+  <div class="cloud cloud-1"></div>
+  <div class="cloud cloud-2"></div>
+  <div class="cloud cloud-3"></div>
+  <div class="cloud cloud-4"></div>
+  <div class="hills-far"></div>
+  <div class="hills-near"></div>
+  <div class="grass-strip"></div>
+  <div class="grass-tufts"></div>
+  <div class="ground-layer"></div>
+  <div class="dirt-bumps"></div>
+  <!-- background worm decorations -->
+  <div class="bg-worm" style="bottom:28%;left:3%;font-size:1.8rem;">🐛</div>
+  <div class="bg-worm" style="bottom:24%;left:55%;font-size:2.2rem;">🐛</div>
+  <div class="bg-worm" style="bottom:26%;right:5%;font-size:1.6rem;">🐛</div>
+  <!-- Flowers -->
+  <div style="position:absolute;bottom:22%;left:8%;font-size:1.6rem;opacity:0.7;animation:wormWiggle 4s ease-in-out infinite;">🌼</div>
+  <div style="position:absolute;bottom:22%;left:25%;font-size:1.4rem;opacity:0.7;animation:wormWiggle 3.5s ease-in-out infinite;animation-delay:-1s;">🌸</div>
+  <div style="position:absolute;bottom:22%;left:45%;font-size:1.6rem;opacity:0.6;animation:wormWiggle 4.5s ease-in-out infinite;animation-delay:-.5s;">🌻</div>
+  <div style="position:absolute;bottom:22%;right:20%;font-size:1.4rem;opacity:0.7;animation:wormWiggle 3.8s ease-in-out infinite;animation-delay:-2s;">🌼</div>
+  <div style="position:absolute;bottom:22%;right:6%;font-size:1.8rem;opacity:0.65;animation:wormWiggle 4.2s ease-in-out infinite;animation-delay:-.8s;">🍄</div>
+  <div style="position:absolute;bottom:23%;left:70%;font-size:1.5rem;opacity:0.6;">🪨</div>
+  <div style="position:absolute;bottom:22%;left:85%;font-size:1.3rem;opacity:0.55;animation:wormWiggle 3.2s ease-in-out infinite;animation-delay:-1.5s;">🌼</div>
+  <div style="position:absolute;bottom:23%;left:15%;font-size:1.2rem;opacity:0.5;">🪨</div>
+</div>
+
+<!-- Particles container -->
+<div id="particles-container"></div>
+
+<!-- Eye cursor -->
 <div id="eyeCursor"></div>
 
-<!-- SETUP -->
+<!-- ════════════════════════ SETUP ════════════════════════ -->
 <div id="setup" class="screen active">
   <div class="logo-worm">🐛</div>
   <div class="logo">Regenwormen</div>
@@ -245,137 +1231,115 @@ linear-gradient(#7ad66f,#4fa84b);
   </div>
 </div>
 
-<!-- RULES -->
+<!-- ════════════════════════ RULES ════════════════════════ -->
 <div id="rules" class="screen">
   <div class="card">
-    <div class="logo">📜 Spelregels</div>
-    <div class="card" style="text-align:left;line-height:1.6;">
-      
+    <div class="logo" style="font-size:2.5rem;margin-bottom:1rem;">📜 Spelregels</div>
+    <div style="text-align:left;line-height:1.7;font-size:.93rem;color:#5a3200;">
       <h3>Doel van het spel</h3>
-    Bij Regenwormen probeer je zoveel mogelijk regenwormen te verzamelen door tegels te winnen. Op iedere tegel staat een bepaald aantal regenwormen afgebeeld. 
-    Aan het einde van het spel tel je alle regenwormen op die op jouw verzamelde tegels staan. De speler met de meeste regenwormen wint het spel. 
-    Wanneer twee spelers evenveel regenwormen hebben, wint de speler met de hoogste tegel.
+      Bij Regenwormen probeer je zoveel mogelijk regenwormen te verzamelen door tegels te winnen. Op iedere tegel staat een bepaald aantal regenwormen afgebeeld.
+      Aan het einde van het spel tel je alle regenwormen op die op jouw verzamelde tegels staan. De speler met de meeste regenwormen wint het spel.
+      Wanneer twee spelers evenveel regenwormen hebben, wint de speler met de hoogste tegel.
       <br><br>
-      
       <h3>Spelmateriaal</h3>
-      Het spel bestaat uit zestien tegels met de getallen 21 tot en met 36. Op deze tegels staan één tot vier regenwormen afgebeeld. 
-      Daarnaast zijn er acht dobbelstenen. Op iedere dobbelsteen staan de cijfers 1 tot en met 5 en een regenwormsymbool. 
+      Het spel bestaat uit zestien tegels met de getallen 21 tot en met 36. Op deze tegels staan één tot vier regenwormen afgebeeld.
+      Daarnaast zijn er acht dobbelstenen. Op iedere dobbelsteen staan de cijfers 1 tot en met 5 en een regenwormsymbool.
       Een regenworm telt tijdens het spel als vijf punten.
       <br><br>
-      
       <h3>Voorbereiding</h3>
-      Aan het begin van het spel worden alle tegels in oplopende volgorde naast elkaar gelegd, van 21 tot en met 36. Alle spelers moeten de tegels goed kunnen zien. 
+      Aan het begin van het spel worden alle tegels in oplopende volgorde naast elkaar gelegd, van 21 tot en met 36. Alle spelers moeten de tegels goed kunnen zien.
       Daarna krijgt de jongste speler de acht dobbelstenen en kan het spel beginnen.
-      
       <h3>Verloop van een beurt</h3>
-      Tijdens een beurt probeert een speler genoeg punten te gooien om een tegel te kunnen pakken. De speler begint door alle acht dobbelstenen tegelijk te gooien. 
-      Na iedere worp moet de speler één soort symbool kiezen. Dat mogen bijvoorbeeld alleen de vieren zijn, alleen de tweeën of alleen de regenwormen. Alle dobbelstenen met dat gekozen symbool worden apart gelegd. 
-      De speler mag niet slechts een deel kiezen; alle dobbelstenen met dat symbool moeten apart worden gelegd.Daarna worden de punten van deze dobbelstenen opgeteld. Gewone cijfers tellen als hun eigen waarde en een regenworm telt als vijf punten. 
-      Vervolgens gooit de speler opnieuw met de overgebleven dobbelstenen.Bij iedere nieuwe worp moet opnieuw één symbool worden gekozen dat nog niet eerder in die beurt gekozen is. Een speler mag dus nooit hetzelfde symbool twee keer kiezen. 
+      Tijdens een beurt probeert een speler genoeg punten te gooien om een tegel te kunnen pakken. De speler begint door alle acht dobbelstenen tegelijk te gooien.
+      Na iedere worp moet de speler één soort symbool kiezen. Dat mogen bijvoorbeeld alleen de vieren zijn, alleen de tweeën of alleen de regenwormen. Alle dobbelstenen met dat gekozen symbool worden apart gelegd.
+      De speler mag niet slechts een deel kiezen; alle dobbelstenen met dat symbool moeten apart worden gelegd. Daarna worden de punten van deze dobbelstenen opgeteld. Gewone cijfers tellen als hun eigen waarde en een regenworm telt als vijf punten.
+      Vervolgens gooit de speler opnieuw met de overgebleven dobbelstenen. Bij iedere nieuwe worp moet opnieuw één symbool worden gekozen dat nog niet eerder in die beurt gekozen is. Een speler mag dus nooit hetzelfde symbool twee keer kiezen.
       Dobbelstenen die al apart zijn gelegd, mogen ook niet opnieuw worden gegooid. De beurt gaat door totdat de speler besluit te stoppen of totdat er geen geldige keuze meer mogelijk is.
       <br><br>
-    
       <h3>Een tegel pakken</h3>
-      Het spel bestaat uit zestien tegels met de getallen 21 tot en met 36. Op deze tegels staan één tot vier regenwormen afgebeeld. 
-      Daarnaast zijn er acht dobbelstenen. Op iedere dobbelsteen staan de cijfers 1 tot en met 5 en een regenwormsymbool. 
-      Een regenworm telt tijdens het spel als vijf punten.
+      Wanneer een speler wil stoppen, wordt het totaal aantal punten van alle opzijgelegde dobbelstenen berekend. Om een tegel te pakken moet een speler minstens één regenworm hebben gegooid.
+      De speler pakt de tegel die overeenkomt met het totaal, of de hoogste tegel die lager is dan het totaal. Als die tegel niet beschikbaar is, mislukt de beurt.
       <br><br>
-      
       <h3>Tegels stelen</h3>
-      Een speler mag ook een tegel van een andere speler stelen. Dit mag alleen wanneer het gegooide totaal exact overeenkomt met de bovenste tegel van die speler. 
+      Een speler mag ook een tegel van een andere speler stelen. Dit mag alleen wanneer het gegooide totaal exact overeenkomt met de bovenste tegel van die speler.
       Alleen de bovenste tegel van een stapel kan dus worden afgepakt. Onderliggende tegels zijn veilig zolang ze bedekt zijn.
       Wanneer een tegel wordt gestolen, legt de speler deze boven op zijn eigen stapel.
       <br><br>
-    
-    <h3>Tegels stapelen</h3>
-      Iedere gewonnen tegel wordt boven op de eigen stapel gelegd. Alleen de bovenste tegel blijft zichtbaar voor de andere spelers. 
-      Deze bovenste tegel kan later eventueel door een andere speler worden gestolen.
-      <br><br>
-
       <h3>Wanneer mislukt een beurt</h3>
-      Een beurt kan op verschillende manieren mislukken. Dat gebeurt bijvoorbeeld wanneer een speler na een worp alleen symbolen gooit die eerder in dezelfde beurt al gekozen zijn. 
-      Omdat er dan geen nieuw symbool meer gekozen kan worden, eindigt de beurt direct.Een beurt mislukt ook wanneer een speler geen regenworm heeft verzameld. Zelfs met genoeg punten mag er dan geen tegel worden gepakt.
-      Daarnaast mislukt een beurt wanneer het totaal aantal punten niet overeenkomt met een beschikbare tegel en er ook geen lagere tegel meer beschikbaar is.
+      Een beurt kan op verschillende manieren mislukken. Dat gebeurt wanneer een speler na een worp alleen symbolen gooit die eerder in dezelfde beurt al gekozen zijn.
+      Een beurt mislukt ook wanneer een speler geen regenworm heeft verzameld, of wanneer het totaal niet overeenkomt met een beschikbare tegel.
       <br><br>
-    
-       <h3>Straf bij een mislukte beurt</h3>
-      Wanneer een beurt mislukt, moet de speler zijn bovenste tegel terugleggen in de rij met open tegels. Daarna wordt de hoogste openliggende tegel omgedraaid. Deze tegel verdwijnt uit het spel en kan later niet meer worden gepakt.
-      Als de tegel die werd teruggelegd toevallig zelf de hoogste tegel is, hoeft er geen extra tegel te worden omgedraaid.
+      <h3>Straf bij een mislukte beurt</h3>
+      Wanneer een beurt mislukt, moet de speler zijn bovenste tegel terugleggen in de rij met open tegels. Daarna wordt de hoogste openliggende tegel omgedraaid en verdwijnt uit het spel.
       <br><br>
-    
-       <h3>Einde van het spel</h3>
-      Het spel eindigt wanneer alle tegels uit het midden verdwenen zijn of zijn omgedraaid. Daarna tellen alle spelers het aantal regenwormen op hun verzamelde tegels. 
+      <h3>Einde van het spel</h3>
+      Het spel eindigt wanneer alle tegels uit het midden verdwenen zijn of zijn omgedraaid. Daarna tellen alle spelers het aantal regenwormen op hun verzamelde tegels.
       De speler met de meeste regenwormen wint het spel.
-      <br><br>
-    
-        <h3>Strategie en tips</h3>
-      Bij Regenwormen is het belangrijk om risico’s goed af te wegen. Soms is het slim om vroeg te stoppen en een veilige tegel te pakken. 
-      In andere situaties kan doorgooien juist aantrekkelijk zijn omdat hogere tegels meer regenwormen opleveren.Het verzamelen van regenwormen is erg belangrijk, omdat een speler zonder regenworm nooit een tegel mag pakken. 
-      Ook het stelen van tegels van tegenstanders kan een sterke tactiek zijn, vooral wanneer een tegenstander een waardevolle tegel boven op zijn stapel heeft liggen.
-      <br><br>
-    
-    
-    
-    
     </div>
   </div>
+  <br>
   <button class="big-btn btn-green" onclick="showScreen('setup')">
     ⬅ Terug <div class="dwell-ring"></div>
   </button>
 </div>
 
-<!-- GAME -->
+<!-- ════════════════════════ GAME ════════════════════════ -->
 <div id="game" class="screen">
   <div class="g-header">
     <div>
-      <div class="gh-label">Aan de beurt</div>
+      <div class="gh-label">🎮 Aan de beurt</div>
       <div class="gh-name" id="hName">—</div>
     </div>
     <div class="gh-mid">
       <div class="gh-score" id="hScore">0</div>
       <div class="gh-label">Beurt totaal</div>
     </div>
-
-    <div class="gh-right">
+    <div style="text-align:right;">
       <div class="gh-label">Jouw wormen</div>
-      <div id="hWorms">🐛 0</div>
+      <div class="gh-worm-count" id="hWorms">🐛 0</div>
     </div>
   </div>
+
   <div class="g-section">
-    <div class="sec-label">Tegels op tafel — klik om te selecteren</div>
+    <div class="sec-label">🏆 Tegels op tafel — klik om te selecteren</div>
     <div class="tile-row" id="tileRow"></div>
   </div>
+
   <div class="dice-card">
     <div class="instruction" id="instruction">Druk op 🎲 Gooi! om te beginnen</div>
-    <div class="sec-label-dark">Gegooid — klik op een dobbelsteen</div>
+    <div class="sec-label-dark">🎲 Gegooid — klik op een dobbelsteen om te kiezen</div>
     <div class="dice-row" id="diceRow"></div>
-    <div class="sec-label-dark">Opzijgelegd</div>
-    <div class="chosen-area" id="chosenArea"></div>
+    <div class="sec-label-dark">✅ Opzijgelegd</div>
+    <div class="chosen-area" id="chosenArea">
+      <div class="chosen-area-empty-hint" id="chosenHint">Nog niets gekozen...</div>
+    </div>
     <div class="action-row">
       <button class="big-btn btn-blue" id="btnRoll" onclick="doRoll()">
         🎲 Gooi! <div class="dwell-ring"></div>
       </button>
-      <button class="big-btn btn-orange" id="btnStop" onclick="doStop()" disabled>
+      <button class="big-btn btn-red" id="btnStop" onclick="doStop()" disabled>
         🛑 Stop beurt <div class="dwell-ring"></div>
       </button>
     </div>
   </div>
+
   <div class="players-grid" id="playersGrid"></div>
 </div>
 
-<!-- GAME OVER -->
+<!-- ════════════════════════ GAME OVER ════════════════════════ -->
 <div id="gameover" class="screen">
-  <div class="go-title">🏆 Einde spel!</div>
+  <div class="logo-worm" style="font-size:4rem;">🏆</div>
+  <div class="go-title">Einde spel!</div>
   <div class="ranking" id="rankingList"></div>
   <button class="big-btn btn-green" id="btnReplay" onclick="resetGame()">
     🔄 Opnieuw spelen <div class="dwell-ring"></div>
   </button>
 </div>
 
-<!-- OVERLAY -->
+<!-- ════════════════════════ OVERLAY ════════════════════════ -->
 <div id="overlay">
   <div class="msg-box">
-    <div class="msg-icon" id="mIcon">😢</div>
+    <span class="msg-icon" id="mIcon">😢</span>
     <div class="msg-title" id="mTitle">—</div>
     <div class="msg-text" id="mText"></div>
     <button class="msg-ok" id="mBtn" onclick="closeOverlay()">
@@ -386,20 +1350,10 @@ linear-gradient(#7ad66f,#4fa84b);
 
 <script>
 /* ========================= DWELL ========================= */
-/*
-  FIX 1 — Dwell is per-player, not global.
-  isDwellActive() now checks BOTH:
-    - eyeEnabled (global: has camera started?)
-    - players[currentPlayer].eyeTracking (this player opted in)
-  applyDwell() and checkEyeHover() both use isDwellActive().
-  Mouse-hover dwell only fires for the current player with eye tracking.
-*/
 let dwellDuration = 1500;
-let eyeEnabled = false; // true once camera has started
+let eyeEnabled = false;
 
 function isDwellActive() {
-  // Only active if global eye tracking is running AND
-  // the current player has opted in to eye tracking.
   if (!eyeEnabled) return false;
   const p = players[currentPlayer];
   return p ? p.eyeTracking : false;
@@ -411,24 +1365,16 @@ function setSpeed(btn) {
   dwellDuration = parseInt(btn.dataset.ms);
 }
 
-// Dwell via mouse hover — only fires if isDwellActive() at the moment of hover
 function applyDwell(el, callback) {
   let timer = null;
   el.addEventListener('mouseenter', () => {
-    // Re-check at hover time — player may have changed since element was created
     if (!isDwellActive()) return;
     const ring = el.querySelector('.dwell-ring');
     const start = Date.now();
     timer = setInterval(() => {
       const progress = Math.min((Date.now() - start) / dwellDuration, 1);
-      if (ring) {
-        ring.style.background = `conic-gradient(rgba(255,255,255,.55) ${progress * 360}deg, transparent 0deg)`;
-      }
-      if (progress >= 1) {
-        clearInterval(timer);
-        if (ring) ring.style.background = '';
-        callback();
-      }
+      if (ring) ring.style.background = `conic-gradient(rgba(255,255,255,.55) ${progress * 360}deg, transparent 0deg)`;
+      if (progress >= 1) { clearInterval(timer); if (ring) ring.style.background = ''; callback(); }
     }, 16);
   });
   el.addEventListener('mouseleave', () => {
@@ -438,18 +1384,55 @@ function applyDwell(el, callback) {
   });
 }
 
-/* ========================= GAME STATE ========================= */
+/* ========================= AUDIO ========================= */
 const rollSound = new Audio('dice.mp3');
 const sparkleSound = new Audio('sparkle.mp3');
 let soundEnabled = true;
+
+/* ========================= PARTICLES ========================= */
+function spawnParticles(x, y, count, colors, emojis) {
+  const container = document.getElementById('particles-container');
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.random() * Math.PI * 2);
+    const speed = 60 + Math.random() * 120;
+    const dx = Math.cos(angle) * speed;
+    const dy = Math.sin(angle) * speed - 60;
+    if (emojis && emojis.length > 0 && Math.random() > 0.4) {
+      const p = document.createElement('div');
+      p.className = 'star-particle';
+      p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      p.style.cssText = `left:${x}px;top:${y}px;--dx:${dx}px;--dy:${dy}px;animation-duration:${0.8 + Math.random() * 0.6}s;animation-delay:${Math.random() * 0.2}s;`;
+      container.appendChild(p);
+      setTimeout(() => p.remove(), 2000);
+    } else {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const size = 6 + Math.random() * 10;
+      p.style.cssText = `left:${x}px;top:${y}px;width:${size}px;height:${size}px;background:${color};--dx:${dx}px;--dy:${dy}px;animation-duration:${0.7 + Math.random() * 0.5}s;animation-delay:${Math.random() * 0.15}s;`;
+      container.appendChild(p);
+      setTimeout(() => p.remove(), 1500);
+    }
+  }
+}
+
+function spawnScorePop(x, y, text) {
+  const el = document.createElement('div');
+  el.className = 'score-pop';
+  el.textContent = text;
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1600);
+}
+
+/* ========================= GAME STATE ========================= */
 let players = [];
 let currentPlayer = 0;
 let tableTiles = [];
 let dice = [];
 let chosenDice = [];
 let locked = [];
-
-
 
 /* ========================= SETUP ========================= */
 let numPlayers = 2;
@@ -479,7 +1462,6 @@ function buildNames() {
   for (let i = 0; i < numPlayers; i++) {
     const wrapper = document.createElement('div');
     wrapper.className = 'player-setup';
-    wrapper.style.cssText = 'background:#fff;padding:12px;border-radius:14px;margin-bottom:10px;';
 
     const inp = document.createElement('input');
     inp.className = 'name-input';
@@ -493,6 +1475,7 @@ function buildNames() {
     eyeCheck.className = 'eye-check';
     const eyeLabel = document.createElement('label');
     eyeLabel.textContent = ' Eye tracking (dwell timer automatisch aan)';
+    eyeLabel.style.cssText = 'font-size:.85rem;color:#8B5E0A;font-weight:700;cursor:pointer;';
     eyeRow.appendChild(eyeCheck);
     eyeRow.appendChild(eyeLabel);
 
@@ -515,6 +1498,8 @@ function startGame() {
   showScreen('game');
   renderAll();
   updateAccessibility();
+  // welcome particles
+  setTimeout(() => spawnParticles(window.innerWidth/2, window.innerHeight/2, 20, ['#FFD700','#FFA500','#2ecc71','#3498db'], ['🐛','⭐','🎲']), 300);
 }
 
 function resetGame() { showScreen('setup'); }
@@ -523,7 +1508,6 @@ function resetTurn() {
   dice = [];
   chosenDice = [];
   locked = [];
-
 }
 
 function showScreen(id) {
@@ -538,14 +1522,17 @@ function label(v) { return v === 'W' ? '🐛' : String(v); }
 function turnScore() { return chosenDice.reduce((s, d) => s + (d === 'W' ? 5 : d), 0); }
 function pWorms(p) { return p.tiles.reduce((s, t) => s + wormValue(t), 0); }
 
-/* ========================= TILE CLICK (FIX 2) ========================= */
-/*
-  Event flow: user clicks tile → clickTile(number) →
-    tegel wordt direct uit tableTiles gehaald en
-    bovenop de stapel van de huidige speler gelegd.
-*/
-function clickTile(tileNum) {
+/* ========================= TILE CLICK ========================= */
+function clickTile(tileNum, el) {
   if (!tableTiles.includes(tileNum)) return;
+  // particle burst on the tile
+  if (el) {
+    const rect = el.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
+    spawnParticles(cx, cy, 18, ['#FFD700','#FFA500','#fff200','#ff9900'], ['⭐','✨','🐛']);
+    spawnScorePop(cx, cy - 20, '+' + wormValue(tileNum) + '🐛');
+  }
   tableTiles = tableTiles.filter(t => t !== tileNum);
   players[currentPlayer].tiles.push(tileNum);
   if (tableTiles.length === 0) { renderGameOver(); showScreen('gameover'); return; }
@@ -554,7 +1541,7 @@ function clickTile(tileNum) {
 
 /* ========================= ROLL ========================= */
 function doRoll() {
-  if (soundEnabled) { rollSound.currentTime = 0; rollSound.play(); }
+  if (soundEnabled) { rollSound.currentTime = 0; rollSound.play().catch(()=>{}); }
   if (dice.length > 0) return;
   const remaining = 8 - chosenDice.length;
   if (remaining === 0) { doStop(); return; }
@@ -572,10 +1559,20 @@ function doRoll() {
 }
 
 /* ========================= LOCK VALUE ========================= */
-function lockValue(value) {
+function lockValue(value, dieEl) {
   if (locked.includes(value)) return;
   if (!dice.includes(value)) return;
-  if (value === 'W' && soundEnabled) { sparkleSound.currentTime = 0; sparkleSound.play(); }
+  if (value === 'W' && soundEnabled) { sparkleSound.currentTime = 0; sparkleSound.play().catch(()=>{}); }
+  // particle burst
+  if (dieEl) {
+    const rect = dieEl.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
+    const colors = value === 'W'
+      ? ['#ff69b4','#ff1493','#da70d6','#ba55d3']
+      : ['#FFD700','#FFA500','#fff200'];
+    spawnParticles(cx, cy, 12, colors, value === 'W' ? ['🐛','✨'] : ['⭐','✨']);
+  }
   locked.push(value);
   chosenDice.push(...dice.filter(d => d === value));
   dice = [];
@@ -600,33 +1597,34 @@ function doStop() {
   }
   const score = turnScore();
 
-  // ── Steal from another player (exact top-tile match, always possible) ──
+  // Steal
   for (let i = 0; i < players.length; i++) {
     if (i === currentPlayer) continue;
     const p = players[i];
     const top = p.tiles[p.tiles.length - 1];
     if (top === score) {
       players[currentPlayer].tiles.push(p.tiles.pop());
+      spawnParticles(window.innerWidth/2, window.innerHeight/2, 25, ['#ff69b4','#FFD700','#FFA500'], ['🐛','⭐','🎉']);
       showOverlay('🎉', 'Gestolen!', `${p.name} verliest tegel ${score}`, nextTurn);
       return;
     }
   }
 
-  // ── Exact match on table ──
+  // Exact match
   if (tableTiles.includes(score)) {
     tableTiles = tableTiles.filter(t => t !== score);
     players[currentPlayer].tiles.push(score);
-    afterTake(`Tegel ${score} gepakt!`);
+    afterTake(`Tegel ${score} gepakt! (+${wormValue(score)}🐛)`);
     return;
   }
 
-  // ── Highest lower tile ──
+  // Highest lower
   const lower = tableTiles.filter(t => t < score);
   if (lower.length > 0) {
     const best = lower[lower.length - 1];
     tableTiles = tableTiles.filter(t => t !== best);
     players[currentPlayer].tiles.push(best);
-    afterTake(`Tegel ${best} gepakt!`);
+    afterTake(`Tegel ${best} gepakt! (+${wormValue(best)}🐛)`);
     return;
   }
 
@@ -634,6 +1632,7 @@ function doStop() {
 }
 
 function afterTake(msg) {
+  spawnParticles(window.innerWidth/2, window.innerHeight/2, 20, ['#FFD700','#FFA500','#2ecc71'], ['⭐','✨','🐛']);
   if (tableTiles.length === 0) {
     renderGameOver();
     showOverlay('✅', 'Tegel gepakt!', msg, () => showScreen('gameover'));
@@ -692,23 +1691,16 @@ function renderAll() {
   updateButtons();
 }
 
-/*
-  FIX 2 — Tiles now get a proper onclick handler.
-  Each tile div calls clickTile(tileNumber) on click.
-  No pointer-events interference: .dwell-ring is pointer-events:none
-  so it never blocks the parent's click.
-*/
 function renderTiles() {
   const el = document.getElementById('tileRow');
   el.innerHTML = '';
-  tableTiles.forEach(t => {
+  tableTiles.forEach((t, idx) => {
     const d = document.createElement('div');
     d.className = 'tile';
+    d.style.animationDelay = (idx * 0.04) + 's';
     d.innerHTML = `<div class="tile-n">${t}</div><div class="tile-w">🐛${wormValue(t)}</div>`;
-    // ── Click handler ──
-    d.addEventListener('click', () => clickTile(t));
-    // ── Eye-tracking dwell for tiles ──
-    applyDwell(d, () => clickTile(t));
+    d.addEventListener('click', () => clickTile(t, d));
+    applyDwell(d, () => clickTile(t, d));
     el.appendChild(d);
   });
 }
@@ -721,11 +1713,11 @@ function renderDiceArea(animate = false) {
     const alreadyLocked = locked.includes(v);
     const die = document.createElement('div');
     die.className = 'die' + (alreadyLocked ? ' used' : '');
-    if (animate) { die.classList.add('rolling'); die.style.animationDelay = (idx * 0.05) + 's'; }
+    if (animate) { die.classList.add('rolling'); die.style.animationDelay = (idx * 0.06) + 's'; }
     die.innerHTML = `${label(v)}<div class="dwell-ring"></div>`;
     if (!alreadyLocked) {
-      die.addEventListener('click', () => lockValue(v));
-      applyDwell(die, () => lockValue(v));
+      die.addEventListener('click', () => lockValue(v, die));
+      applyDwell(die, () => lockValue(v, die));
     }
     el.appendChild(die);
   });
@@ -733,10 +1725,18 @@ function renderDiceArea(animate = false) {
 
 function renderChosen() {
   const el = document.getElementById('chosenArea');
+  const hint = document.getElementById('chosenHint');
   el.innerHTML = '';
-  chosenDice.forEach(v => {
+  if (hint) el.appendChild(hint);
+  if (chosenDice.length === 0) {
+    if (hint) hint.style.display = '';
+    return;
+  }
+  if (hint) hint.style.display = 'none';
+  chosenDice.forEach((v, i) => {
     const d = document.createElement('div');
     d.className = 'c-die';
+    d.style.animationDelay = (i * 0.05) + 's';
     d.textContent = label(v);
     el.appendChild(d);
   });
@@ -749,13 +1749,16 @@ function renderPlayers() {
     const top = p.tiles.length > 0 ? p.tiles[p.tiles.length - 1] : null;
     const card = document.createElement('div');
     card.className = 'p-card' + (i === currentPlayer ? ' cur' : '');
+    card.style.animationDelay = (i * 0.06) + 's';
     card.innerHTML = `
       <div class="p-name">${p.name}${p.eyeTracking ? ' 👁️' : ''}</div>
-      <div class="p-worms">🐛 ${pWorms(p)}</div>
-      ${top
-        ? `<div class="p-tile"><div>${top}</div><div>🐛${wormValue(top)}</div></div>`
-        : `<div class="p-empty">Geen tegels</div>`}
-      ${p.tiles.length > 1 ? `<div class="p-stack">+ ${p.tiles.length - 1} bedekt</div>` : ''}
+      <div class="p-worms">🐛 ${pWorms(p)} worm${pWorms(p) === 1 ? '' : 'en'}</div>
+      <div class="p-tile-wrap">
+        ${top
+          ? `<div class="p-tile"><div>${top}</div><div style="font-size:.7rem">🐛${wormValue(top)}</div></div>`
+          : `<div class="p-empty">Geen tegels</div>`}
+        ${p.tiles.length > 1 ? `<div class="p-stack">+${p.tiles.length - 1}<br>bedekt</div>` : ''}
+      </div>
     `;
     el.appendChild(card);
   });
@@ -786,6 +1789,8 @@ function renderGameOver() {
   ranked.forEach((p, i) => {
     const row = document.createElement('div');
     row.className = 'rank-row' + (i === 0 ? ' first' : '');
+    row.style.animationDelay = (i * 0.1) + 's';
+    row.style.animation = 'bounceIn .5s cubic-bezier(.34,1.56,.64,1) both';
     row.innerHTML = `
       <div class="rank-pos">${['🥇', '🥈', '🥉'][i] || (i + 1) + '.'}</div>
       <div class="rank-name">${p.name}</div>
@@ -793,11 +1798,24 @@ function renderGameOver() {
     `;
     list.appendChild(row);
   });
+  // Confetti for winner
+  setTimeout(() => {
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => {
+        spawnParticles(
+          Math.random() * window.innerWidth,
+          -20,
+          12,
+          ['#FFD700','#FFA500','#ff69b4','#2ecc71','#3498db'],
+          ['⭐','🎉','🐛','✨']
+        );
+      }, i * 200);
+    }
+  }, 500);
 }
 
 /* ========================= EYE TRACKING ========================= */
-let camera;
-let faceMesh;
+let camera, faceMesh;
 
 function startTracking() {
   if (eyeEnabled) return;
@@ -840,19 +1858,11 @@ function onFaceResults(results) {
   checkEyeHover(px, py);
 }
 
-/* ========================= EYE HOVER / DWELL ========================= */
-/*
-  FIX 1 — checkEyeHover guards on isDwellActive().
-  If the current player does NOT have eye tracking, the loop exits immediately.
-  The eye cursor itself is also hidden via updateAccessibility().
-*/
 let eyeHoverElement = null;
 let eyeHoverStart = 0;
 
 function checkEyeHover(ex, ey) {
-  // Guard: only run if global eye tracking is on AND current player has it
   if (!isDwellActive()) return;
-
   const elements = document.querySelectorAll('.big-btn, .die, .msg-ok, .tile');
   let hovered = null;
   elements.forEach(el => {
@@ -862,23 +1872,16 @@ function checkEyeHover(ex, ey) {
       hovered = el;
     }
   });
-
   if (hovered !== eyeHoverElement) {
     eyeHoverElement = hovered;
     eyeHoverStart = Date.now();
     document.querySelectorAll('.dwell-ring').forEach(r => r.style.background = '');
   }
   if (!hovered) return;
-
   const progress = (Date.now() - eyeHoverStart) / dwellDuration;
   const ring = hovered.querySelector('.dwell-ring');
-  if (ring) {
-    ring.style.background = `conic-gradient(rgba(255,255,255,.55) ${progress * 360}deg, transparent 0deg)`;
-  }
-  if (progress >= 1) {
-    hovered.click();
-    eyeHoverElement = null;
-  }
+  if (ring) ring.style.background = `conic-gradient(rgba(255,255,255,.55) ${progress * 360}deg, transparent 0deg)`;
+  if (progress >= 1) { hovered.click(); eyeHoverElement = null; }
 }
 
 window.showRules = function () { showScreen('rules'); };
@@ -889,12 +1892,6 @@ function toggleSound() {
   btn.innerHTML = (soundEnabled ? '🔊 Geluid aan' : '🔇 Geluid uit') + '<div class="dwell-ring"></div>';
 }
 
-/*
-  updateAccessibility — called after every turn change.
-  Shows/hides the eye cursor based on CURRENT player's eye tracking setting.
-  This also means dwell rings on buttons won't visually respond for non-eye players
-  because applyDwell() checks isDwellActive() at mouseenter time.
-*/
 function updateAccessibility() {
   const player = players[currentPlayer];
   const cursor = document.getElementById('eyeCursor');
