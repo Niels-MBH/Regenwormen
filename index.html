@@ -1392,37 +1392,7 @@ const popSound = new Audio('pop.mp3');
 const successSound = new Audio('succes.mp3');
 const boingSound = new Audio('boing.mp3');
 const menuMusic = new Audio('menu-music.mp3');
-menuMusic.loop = true;
-menuMusic.volume = 0.25;
 
-let musicStarted = false;
-
-function startMenuMusic() {
-  if (musicStarted) return;
-
-  menuMusic.currentTime = 0;
-
-  menuMusic.play()
-    .then(() => {
-      musicStarted = true;
-    })
-    .catch((e) => {
-      console.log("Autoplay blocked:", e);
-    });
-}
-
-// 👉 start zodra speler de menu pagina aanraakt / beweegt / klikt
-function unlockMusicOnce() {
-  startMenuMusic();
-
-  document.removeEventListener("pointerdown", unlockMusicOnce);
-  document.removeEventListener("mousemove", unlockMusicOnce);
-  document.removeEventListener("touchstart", unlockMusicOnce);
-}
-
-document.addEventListener("pointerdown", unlockMusicOnce);
-document.addEventListener("mousemove", unlockMusicOnce);
-document.addEventListener("touchstart", unlockMusicOnce);
 /* ========================= PARTICLES ========================= */
 function spawnParticles(x, y, count, colors, emojis) {
   const container = document.getElementById('particles-container');
