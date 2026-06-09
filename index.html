@@ -1387,6 +1387,11 @@ function applyDwell(el, callback) {
 /* ========================= AUDIO ========================= */
 const rollSound = new Audio('dice.mp3');
 const sparkleSound = new Audio('sparkle.mp3');
+
+const popSound = new Audio('pop.mp3');
+const successSound = new Audio('succes.mp3');
+const boingSound = new Audio('boing.mp3');
+
 let soundEnabled = true;
 
 /* ========================= PARTICLES ========================= */
@@ -1562,7 +1567,17 @@ function doRoll() {
 function lockValue(value, dieEl) {
   if (locked.includes(value)) return;
   if (!dice.includes(value)) return;
-  if (value === 'W' && soundEnabled) { sparkleSound.currentTime = 0; sparkleSound.play().catch(()=>{}); }
+if (soundEnabled) {
+
+  if (value === 'W') {
+    sparkleSound.currentTime = 0;
+    sparkleSound.play().catch(()=>{});
+  } else {
+    popSound.currentTime = 0;
+    popSound.play().catch(()=>{});
+  }
+
+}
   // particle burst
   if (dieEl) {
     const rect = dieEl.getBoundingClientRect();
@@ -1602,13 +1617,32 @@ function doStop() {
     if (i === currentPlayer) continue;
     const p = players[i];
     const top = p.tiles[p.tiles.length - 1];
-    if (top === score) {
-      players[currentPlayer].tiles.push(p.tiles.pop());
-      spawnParticles(window.innerWidth/2, window.innerHeight/2, 25, ['#ff69b4','#FFD700','#FFA500'], ['🐛','⭐','🎉']);
-      showOverlay('🎉', 'Gestolen!', `${p.name} verliest tegel ${score}`, nextTurn);
-      return;
-    }
+if (top === score) {
+
+  if (soundEnabled) {
+    boingSound.currentTime = 0;
+    boingSound.play().catch(()=>{});
   }
+
+  players[currentPlayer].tiles.push(p.tiles.pop());
+
+  spawnParticles(
+    window.innerWidth/2,
+    window.innerHeight/2,
+    25,
+    ['#ff69b4','#FFD700','#FFA500'],
+    ['🐛','⭐','🎉']
+  );
+
+  showOverlay(
+    '🎉',
+    'Gestolen!',
+    `${p.name} verliest tegel ${score}`,
+    nextTurn
+  );
+
+  return;
+}
 
   // Exact match
   if (tableTiles.includes(score)) {
@@ -1632,12 +1666,35 @@ function doStop() {
 }
 
 function afterTake(msg) {
-  spawnParticles(window.innerWidth/2, window.innerHeight/2, 20, ['#FFD700','#FFA500','#2ecc71'], ['⭐','✨','🐛']);
+
+  if (soundEnabled) {
+    successSound.currentTime = 0;
+    successSound.play().catch(()=>{});
+  }
+
+  spawnParticles(
+    window.innerWidth/2,
+    window.innerHeight/2,
+    20,
+    ['#FFD700','#FFA500','#2ecc71'],
+    ['⭐','✨','🐛']
+  );
+
   if (tableTiles.length === 0) {
     renderGameOver();
-    showOverlay('✅', 'Tegel gepakt!', msg, () => showScreen('gameover'));
+    showOverlay(
+      '✅',
+      'Tegel gepakt!',
+      msg,
+      () => showScreen('gameover')
+    );
   } else {
-    showOverlay('✅', 'Tegel gepakt!', msg, nextTurn);
+    showOverlay(
+      '✅',
+      'Tegel gepakt!',
+      msg,
+      nextTurn
+    );
   }
 }
 
