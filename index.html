@@ -1397,12 +1397,32 @@ menuMusic.volume = 0.25;
 
 let soundEnabled = true;
 
-    function tryPlayMenuMusic() {
-  if (!soundEnabled) return;
+let audioUnlocked = false;
 
-  menuMusic.play().catch(() => {});
+function tryStartMusic() {
+  if (!soundEnabled || audioUnlocked) return;
+
+  menuMusic.volume = 0.25;
+
+  menuMusic.play()
+    .then(() => {
+      audioUnlocked = true;
+    })
+    .catch(() => {
+      // geblokkeerd door browser → wachten op klik/tap
+    });
 }
 
+// proberen zodra site opent
+window.addEventListener('load', tryStartMusic);
+
+// fallback: eerste interactie unlockt audio
+function unlockAudioOnce() {
+  tryStartMusic();
+  document.removeEventListener('pointerdown', unlockAudioOnce);
+}
+
+document.addEventListener('pointerdown', unlockAudioOnce);
 /* ========================= PARTICLES ========================= */
 function spawnParticles(x, y, count, colors, emojis) {
   const container = document.getElementById('particles-container');
@@ -1965,13 +1985,10 @@ function updateAccessibility() {
   const isEyePlayer = eyeEnabled && player?.eyeTracking;
   cursor.style.display = isEyePlayer ? 'block' : 'none';
 }
-window.addEventListener('load', tryPlayMenuMusic);
 
-document.addEventListener('click', () => {
-  if (soundEnabled && menuMusic.paused) {
-    menuMusic.play().catch(() => {});
-  }
-}, { once: true });
+
+
+
 
  
 </script>
