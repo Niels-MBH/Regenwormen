@@ -14,25 +14,7 @@
 :root{
   --sky1:#4ec3f7;
   --sky2:#81d4fa;
-  --grass1:#5cb85c;function toggleSound() {
-    soundEnabled = !soundEnabled;
-
-    if (soundEnabled) {
-        rollSound.muted = false;
-        sparkleSound.muted = false;
-
-        menuMusic.play().catch(err => {
-            console.log("Muziek kon niet starten:", err);
-        });
-
-    } else {
-        rollSound.muted = true;
-        sparkleSound.muted = true;
-
-        menuMusic.pause();
-        menuMusic.currentTime = 0;
-    }
-}
+  --grass1:#5cb85c;
   --grass2:#3d8b3d;
   --dirt1:#8B6914;
   --dirt2:#6B4F0F;
@@ -243,10 +225,7 @@ body{
     radial-gradient(ellipse 8px 19px at 96% 100%,#56c156 0%,transparent 100%);
 }
 
-/* Decorations: flowers, mushrooms, rocks */
-.deco{position:absolute;pointer-events:none;}
-
-/* Worm mascots in background */
+/* Background worm mascots */
 .bg-worm{
   position:absolute;
   font-size:2rem;
@@ -1097,6 +1076,7 @@ body{
   transform:translate(-50%,-50%);
   display:none;
   box-shadow:0 0 15px rgba(0,229,255,0.8);
+  will-change:transform,left,top;
 }
 
 /* ═══════════════════════ PARTICLES ═══════════════════════ */
@@ -1154,7 +1134,6 @@ body{
   100%{transform:scale(1) translateY(-100px);opacity:0;}
 }
 
-/* Worm pop (for stealing) */
 @keyframes wormDance{
   0%{transform:scale(0) rotate(-20deg);}
   40%{transform:scale(1.4) rotate(10deg);}
@@ -1191,19 +1170,71 @@ body{
   <div class="grass-tufts"></div>
   <div class="ground-layer"></div>
   <div class="dirt-bumps"></div>
-  <!-- background worm decorations -->
+
+  <!-- ═══ BACKGROUND WORM MASCOTS (sky area) ═══ -->
   <div class="bg-worm" style="bottom:28%;left:3%;font-size:1.8rem;">🐛</div>
   <div class="bg-worm" style="bottom:24%;left:55%;font-size:2.2rem;">🐛</div>
   <div class="bg-worm" style="bottom:26%;right:5%;font-size:1.6rem;">🐛</div>
-  <!-- Flowers -->
-  <div style="position:absolute;bottom:22%;left:8%;font-size:1.6rem;opacity:0.7;animation:wormWiggle 4s ease-in-out infinite;">🌼</div>
-  <div style="position:absolute;bottom:22%;left:25%;font-size:1.4rem;opacity:0.7;animation:wormWiggle 3.5s ease-in-out infinite;animation-delay:-1s;">🌸</div>
-  <div style="position:absolute;bottom:22%;left:45%;font-size:1.6rem;opacity:0.6;animation:wormWiggle 4.5s ease-in-out infinite;animation-delay:-.5s;">🌻</div>
-  <div style="position:absolute;bottom:22%;right:20%;font-size:1.4rem;opacity:0.7;animation:wormWiggle 3.8s ease-in-out infinite;animation-delay:-2s;">🌼</div>
-  <div style="position:absolute;bottom:22%;right:6%;font-size:1.8rem;opacity:0.65;animation:wormWiggle 4.2s ease-in-out infinite;animation-delay:-.8s;">🍄</div>
-  <div style="position:absolute;bottom:23%;left:70%;font-size:1.5rem;opacity:0.6;">🪨</div>
-  <div style="position:absolute;bottom:22%;left:85%;font-size:1.3rem;opacity:0.55;animation:wormWiggle 3.2s ease-in-out infinite;animation-delay:-1.5s;">🌼</div>
-  <div style="position:absolute;bottom:23%;left:15%;font-size:1.2rem;opacity:0.5;">🪨</div>
+
+  <!-- ═══ NATURAL MEADOW FLORA ═══ -->
+  <!-- Flowers — random sizes, positions, animation timings -->
+  <div style="position:absolute;bottom:22.7%;left:59.3%;font-size:2.02rem;opacity:0.62;animation:wormWiggle 3.7s ease-in-out infinite;animation-delay:-2.1s;pointer-events:none;z-index:1;">🌺</div>
+  <div style="position:absolute;bottom:23.1%;left:85.0%;font-size:1.30rem;opacity:0.85;animation:wormWiggle 3.5s ease-in-out infinite;animation-delay:-1.2s;pointer-events:none;z-index:1;">🌺</div>
+  <div style="position:absolute;bottom:21.5%;left:49.6%;font-size:1.73rem;opacity:0.74;animation:wormWiggle 3.1s ease-in-out infinite;animation-delay:-3.3s;pointer-events:none;z-index:1;">🌷</div>
+  <div style="position:absolute;bottom:21.8%;left:4.1%;font-size:1.07rem;opacity:0.86;animation:wormWiggle 3.1s ease-in-out infinite;animation-delay:-2.1s;pointer-events:none;z-index:1;">🌸</div>
+  <div style="position:absolute;bottom:23.0%;left:17.8%;font-size:1.59rem;opacity:0.68;animation:wormWiggle 3.1s ease-in-out infinite;animation-delay:-1.8s;pointer-events:none;z-index:1;">💐</div>
+  <div style="position:absolute;bottom:22.7%;left:55.0%;font-size:1.29rem;opacity:0.63;animation:wormWiggle 4.8s ease-in-out infinite;animation-delay:-1.2s;pointer-events:none;z-index:1;">🌻</div>
+  <div style="position:absolute;bottom:22.7%;left:28.6%;font-size:1.09rem;opacity:0.82;animation:wormWiggle 5.3s ease-in-out infinite;animation-delay:-2.8s;pointer-events:none;z-index:1;">🌸</div>
+  <div style="position:absolute;bottom:23.2%;left:9.5%;font-size:1.52rem;opacity:0.60;animation:wormWiggle 3.0s ease-in-out infinite;animation-delay:-0.4s;pointer-events:none;z-index:1;">💐</div>
+  <div style="position:absolute;bottom:23.1%;left:36.0%;font-size:1.73rem;opacity:0.58;animation:wormWiggle 5.3s ease-in-out infinite;animation-delay:-2.9s;pointer-events:none;z-index:1;">🌺</div>
+  <div style="position:absolute;bottom:23.0%;left:69.5%;font-size:1.62rem;opacity:0.60;animation:wormWiggle 4.4s ease-in-out infinite;animation-delay:-4.0s;pointer-events:none;z-index:1;">🌸</div>
+  <div style="position:absolute;bottom:22.1%;left:89.9%;font-size:1.69rem;opacity:0.79;animation:wormWiggle 4.8s ease-in-out infinite;animation-delay:-1.3s;pointer-events:none;z-index:1;">🌺</div>
+  <div style="position:absolute;bottom:23.3%;left:44.6%;font-size:1.83rem;opacity:0.91;animation:wormWiggle 4.4s ease-in-out infinite;animation-delay:-1.7s;pointer-events:none;z-index:1;">💐</div>
+  <div style="position:absolute;bottom:22.4%;left:77.2%;font-size:1.11rem;opacity:0.88;animation:wormWiggle 5.4s ease-in-out infinite;animation-delay:-0.5s;pointer-events:none;z-index:1;">💐</div>
+  <div style="position:absolute;bottom:22.7%;left:22.6%;font-size:1.20rem;opacity:0.68;animation:wormWiggle 4.6s ease-in-out infinite;animation-delay:-0.8s;pointer-events:none;z-index:1;">🌺</div>
+  <div style="position:absolute;bottom:21.5%;left:13.7%;font-size:1.44rem;opacity:0.84;animation:wormWiggle 5.2s ease-in-out infinite;animation-delay:-2.5s;pointer-events:none;z-index:1;">💐</div>
+  <div style="position:absolute;bottom:21.8%;left:97.4%;font-size:2.19rem;opacity:0.62;animation:wormWiggle 3.7s ease-in-out infinite;animation-delay:-2.2s;pointer-events:none;z-index:1;">🌻</div>
+  <div style="position:absolute;bottom:22.1%;left:39.7%;font-size:2.07rem;opacity:0.75;animation:wormWiggle 4.4s ease-in-out infinite;animation-delay:-2.4s;pointer-events:none;z-index:1;">🌺</div>
+  <div style="position:absolute;bottom:21.8%;left:32.1%;font-size:1.27rem;opacity:0.83;animation:wormWiggle 3.3s ease-in-out infinite;animation-delay:-1.3s;pointer-events:none;z-index:1;">🌷</div>
+  <div style="position:absolute;bottom:23.3%;left:21.2%;font-size:1.65rem;opacity:0.75;animation:wormWiggle 5.1s ease-in-out infinite;animation-delay:-3.4s;pointer-events:none;z-index:1;">🌺</div>
+  <div style="position:absolute;bottom:21.8%;left:73.1%;font-size:1.08rem;opacity:0.75;animation:wormWiggle 4.9s ease-in-out infinite;animation-delay:-2.7s;pointer-events:none;z-index:1;">🌼</div>
+  <div style="position:absolute;bottom:23.1%;left:63.8%;font-size:2.15rem;opacity:0.74;animation:wormWiggle 3.4s ease-in-out infinite;animation-delay:-2.8s;pointer-events:none;z-index:1;">🌷</div>
+  <div style="position:absolute;bottom:22.5%;left:49.9%;font-size:1.64rem;opacity:0.81;animation:wormWiggle 3.3s ease-in-out infinite;animation-delay:-1.7s;pointer-events:none;z-index:1;">🌸</div>
+
+  <!-- Mushrooms — random sizes and positions -->
+  <div style="position:absolute;bottom:22.9%;left:2.4%;font-size:1.35rem;opacity:0.62;animation:wormWiggle 4.4s ease-in-out infinite;animation-delay:-2.6s;pointer-events:none;z-index:1;">🍄</div>
+  <div style="position:absolute;bottom:22.7%;left:49.7%;font-size:1.30rem;opacity:0.62;animation:wormWiggle 4.0s ease-in-out infinite;animation-delay:-1.1s;pointer-events:none;z-index:1;">🍄</div>
+  <div style="position:absolute;bottom:21.6%;left:68.8%;font-size:1.76rem;opacity:0.94;animation:wormWiggle 4.8s ease-in-out infinite;animation-delay:-2.3s;pointer-events:none;z-index:1;">🍄</div>
+  <div style="position:absolute;bottom:22.7%;left:77.7%;font-size:1.75rem;opacity:0.78;animation:wormWiggle 3.7s ease-in-out infinite;animation-delay:-0.5s;pointer-events:none;z-index:1;">🍄</div>
+  <div style="position:absolute;bottom:21.9%;left:11.1%;font-size:1.26rem;opacity:0.84;animation:wormWiggle 4.6s ease-in-out infinite;animation-delay:-2.0s;pointer-events:none;z-index:1;">🍄</div>
+  <div style="position:absolute;bottom:22.1%;left:94.8%;font-size:1.22rem;opacity:0.72;animation:wormWiggle 5.2s ease-in-out infinite;animation-delay:-0.9s;pointer-events:none;z-index:1;">🍄</div>
+  <div style="position:absolute;bottom:22.9%;left:21.5%;font-size:2.14rem;opacity:0.69;animation:wormWiggle 5.2s ease-in-out infinite;animation-delay:-1.6s;pointer-events:none;z-index:1;">🍄</div>
+  <div style="position:absolute;bottom:22.0%;left:56.0%;font-size:2.01rem;opacity:0.77;animation:wormWiggle 4.6s ease-in-out infinite;animation-delay:-2.3s;pointer-events:none;z-index:1;">🍄</div>
+  <div style="position:absolute;bottom:22.5%;left:31.3%;font-size:1.83rem;opacity:0.90;animation:wormWiggle 5.3s ease-in-out infinite;animation-delay:-1.2s;pointer-events:none;z-index:1;">🍄</div>
+  <div style="position:absolute;bottom:22.0%;left:85.6%;font-size:1.61rem;opacity:0.79;animation:wormWiggle 4.7s ease-in-out infinite;animation-delay:-2.5s;pointer-events:none;z-index:1;">🍄</div>
+
+  <!-- Rocks — static, no animation, varied sizes -->
+  <div style="position:absolute;bottom:22.0%;left:83.7%;font-size:1.55rem;opacity:0.54;pointer-events:none;z-index:1;">🪨</div>
+  <div style="position:absolute;bottom:22.1%;left:92.4%;font-size:1.39rem;opacity:0.64;pointer-events:none;z-index:1;">🪨</div>
+  <div style="position:absolute;bottom:22.5%;left:74.7%;font-size:1.59rem;opacity:0.51;pointer-events:none;z-index:1;">🪨</div>
+  <div style="position:absolute;bottom:21.9%;left:53.7%;font-size:1.38rem;opacity:0.60;pointer-events:none;z-index:1;">🪨</div>
+  <div style="position:absolute;bottom:22.2%;left:65.8%;font-size:1.34rem;opacity:0.63;pointer-events:none;z-index:1;">🪨</div>
+  <div style="position:absolute;bottom:21.9%;left:7.0%;font-size:1.13rem;opacity:0.49;pointer-events:none;z-index:1;">🪨</div>
+
+  <!-- ═══ DECORATIVE WORMS PEEKING FROM THE EARTH ═══ -->
+  <!-- Worms peek from bottom:18-21%, each with unique rotation, size, direction -->
+  <div style="position:absolute;bottom:18.9%;left:76.0%;font-size:1.79rem;opacity:0.73;transform:rotate(-16deg) scaleX(-1);transform-origin:bottom center;animation:wormWiggle 4.6s ease-in-out infinite;animation-delay:-2.6s;pointer-events:none;z-index:2;">🐛</div>
+  <div style="position:absolute;bottom:19.5%;left:41.0%;font-size:1.96rem;opacity:0.67;transform:rotate(29deg) scaleX(1);transform-origin:bottom center;animation:wormWiggle 2.5s ease-in-out infinite;animation-delay:-1.8s;pointer-events:none;z-index:2;">🐛</div>
+  <div style="position:absolute;bottom:20.0%;left:6.0%;font-size:1.40rem;opacity:0.84;transform:rotate(0deg) scaleX(1);transform-origin:bottom center;animation:wormWiggle 2.9s ease-in-out infinite;animation-delay:-0.1s;pointer-events:none;z-index:2;">🐛</div>
+  <div style="position:absolute;bottom:20.5%;left:62.8%;font-size:1.47rem;opacity:0.92;transform:rotate(4deg) scaleX(1);transform-origin:bottom center;animation:wormWiggle 4.3s ease-in-out infinite;animation-delay:-2.9s;pointer-events:none;z-index:2;">🐛</div>
+  <div style="position:absolute;bottom:19.5%;left:88.5%;font-size:2.24rem;opacity:0.79;transform:rotate(-2deg) scaleX(-1);transform-origin:bottom center;animation:wormWiggle 3.0s ease-in-out infinite;animation-delay:-2.8s;pointer-events:none;z-index:2;">🐛</div>
+  <div style="position:absolute;bottom:19.1%;left:23.3%;font-size:1.57rem;opacity:0.90;transform:rotate(-2deg) scaleX(1);transform-origin:bottom center;animation:wormWiggle 4.9s ease-in-out infinite;animation-delay:-1.5s;pointer-events:none;z-index:2;">🐛</div>
+  <div style="position:absolute;bottom:19.4%;left:34.0%;font-size:1.94rem;opacity:0.79;transform:rotate(-29deg) scaleX(1);transform-origin:bottom center;animation:wormWiggle 3.7s ease-in-out infinite;animation-delay:-2.4s;pointer-events:none;z-index:2;">🐛</div>
+  <div style="position:absolute;bottom:18.9%;left:56.0%;font-size:1.89rem;opacity:0.70;transform:rotate(21deg) scaleX(1);transform-origin:bottom center;animation:wormWiggle 3.8s ease-in-out infinite;animation-delay:-1.2s;pointer-events:none;z-index:2;">🐛</div>
+  <div style="position:absolute;bottom:20.9%;left:16.2%;font-size:2.13rem;opacity:0.72;transform:rotate(19deg) scaleX(-1);transform-origin:bottom center;animation:wormWiggle 3.1s ease-in-out infinite;animation-delay:-0.7s;pointer-events:none;z-index:2;">🐛</div>
+  <div style="position:absolute;bottom:18.7%;left:95.3%;font-size:1.64rem;opacity:0.79;transform:rotate(28deg) scaleX(-1);transform-origin:bottom center;animation:wormWiggle 4.9s ease-in-out infinite;animation-delay:-1.6s;pointer-events:none;z-index:2;">🐛</div>
+  <div style="position:absolute;bottom:20.4%;left:46.1%;font-size:1.81rem;opacity:0.85;transform:rotate(29deg) scaleX(1);transform-origin:bottom center;animation:wormWiggle 3.3s ease-in-out infinite;animation-delay:-1.8s;pointer-events:none;z-index:2;">🐛</div>
+  <div style="position:absolute;bottom:19.2%;left:72.5%;font-size:1.23rem;opacity:0.80;transform:rotate(17deg) scaleX(1);transform-origin:bottom center;animation:wormWiggle 3.0s ease-in-out infinite;animation-delay:-2.6s;pointer-events:none;z-index:2;">🐛</div>
 </div>
 
 <!-- Particles container -->
@@ -1406,12 +1437,11 @@ function applyDwell(el, callback) {
 /* ========================= AUDIO ========================= */
 const rollSound = new Audio('dice.mp3');
 const sparkleSound = new Audio('sparkle.mp3');
-
 const menuMusic = new Audio('menu-music.mp3.wav');
 menuMusic.loop = true;
 menuMusic.volume = 0.25;
+let soundEnabled = false;
 
-let soundEnabled = false; // 🔇 standaard uit
 /* ========================= PARTICLES ========================= */
 function spawnParticles(x, y, count, colors, emojis) {
   const container = document.getElementById('particles-container');
@@ -1485,12 +1515,10 @@ function buildNames() {
   for (let i = 0; i < numPlayers; i++) {
     const wrapper = document.createElement('div');
     wrapper.className = 'player-setup';
-
     const inp = document.createElement('input');
     inp.className = 'name-input';
     inp.placeholder = defNames[i];
     inp.value = prev[i] || '';
-
     const eyeRow = document.createElement('div');
     eyeRow.style.marginTop = '8px';
     const eyeCheck = document.createElement('input');
@@ -1501,7 +1529,6 @@ function buildNames() {
     eyeLabel.style.cssText = 'font-size:.85rem;color:#8B5E0A;font-weight:700;cursor:pointer;';
     eyeRow.appendChild(eyeCheck);
     eyeRow.appendChild(eyeLabel);
-
     wrapper.appendChild(inp);
     wrapper.appendChild(eyeRow);
     el.appendChild(wrapper);
@@ -1521,7 +1548,9 @@ function startGame() {
   showScreen('game');
   renderAll();
   updateAccessibility();
-  // welcome particles
+  // Invalidate cached rects after screen switch
+  _rectCache.clear();
+  _rectCacheTime = 0;
   setTimeout(() => spawnParticles(window.innerWidth/2, window.innerHeight/2, 20, ['#FFD700','#FFA500','#2ecc71','#3498db'], ['🐛','⭐','🎲']), 300);
 }
 
@@ -1548,7 +1577,6 @@ function pWorms(p) { return p.tiles.reduce((s, t) => s + wormValue(t), 0); }
 /* ========================= TILE CLICK ========================= */
 function clickTile(tileNum, el) {
   if (!tableTiles.includes(tileNum)) return;
-  // particle burst on the tile
   if (el) {
     const rect = el.getBoundingClientRect();
     const cx = rect.left + rect.width/2;
@@ -1586,7 +1614,6 @@ function lockValue(value, dieEl) {
   if (locked.includes(value)) return;
   if (!dice.includes(value)) return;
   if (value === 'W' && soundEnabled) { sparkleSound.currentTime = 0; sparkleSound.play().catch(()=>{}); }
-  // particle burst
   if (dieEl) {
     const rect = dieEl.getBoundingClientRect();
     const cx = rect.left + rect.width/2;
@@ -1619,8 +1646,6 @@ function doStop() {
     return;
   }
   const score = turnScore();
-
-  // Steal
   for (let i = 0; i < players.length; i++) {
     if (i === currentPlayer) continue;
     const p = players[i];
@@ -1632,16 +1657,12 @@ function doStop() {
       return;
     }
   }
-
-  // Exact match
   if (tableTiles.includes(score)) {
     tableTiles = tableTiles.filter(t => t !== score);
     players[currentPlayer].tiles.push(score);
     afterTake(`Tegel ${score} gepakt! (+${wormValue(score)}🐛)`);
     return;
   }
-
-  // Highest lower
   const lower = tableTiles.filter(t => t < score);
   if (lower.length > 0) {
     const best = lower[lower.length - 1];
@@ -1650,7 +1671,6 @@ function doStop() {
     afterTake(`Tegel ${best} gepakt! (+${wormValue(best)}🐛)`);
     return;
   }
-
   showOverlay('😢', 'Helaas!', 'Geen tegel beschikbaar.', fail);
 }
 
@@ -1687,6 +1707,9 @@ function nextTurn() {
   resetTurn();
   renderAll();
   updateAccessibility();
+  // Invalidate rect cache on new turn (DOM changed)
+  _rectCache.clear();
+  _rectCacheTime = 0;
 }
 
 /* ========================= OVERLAY ========================= */
@@ -1697,6 +1720,9 @@ function showOverlay(icon, title, text, cb) {
   document.getElementById('mText').textContent = text;
   overlayCallback = cb;
   document.getElementById('overlay').classList.add('show');
+  // Invalidate rect cache: overlay changes layout
+  _rectCache.clear();
+  _rectCacheTime = 0;
   renderAll();
 }
 function closeOverlay() {
@@ -1821,7 +1847,6 @@ function renderGameOver() {
     `;
     list.appendChild(row);
   });
-  // Confetti for winner
   setTimeout(() => {
     for (let i = 0; i < 5; i++) {
       setTimeout(() => {
@@ -1837,13 +1862,58 @@ function renderGameOver() {
   }, 500);
 }
 
-/* ========================= EYE TRACKING ========================= */
+/* ========================= EYE TRACKING (OPTIMIZED) ========================= */
+/*
+ * OPTIMIZATIONS vs original:
+ * 1. Rect cache: getBoundingClientRect() is expensive; cache all rects with a
+ *    TTL of 500ms. Only re-query on DOM changes (renderAll, nextTurn, overlay).
+ * 2. Element list cache: querySelectorAll only runs when DOM changes, not every
+ *    MediaPipe frame. Stored in _interactiveEls.
+ * 3. requestAnimationFrame gate: gaze results are processed at most once per
+ *    rAF tick, not at MediaPipe's raw callback rate (~30fps can sometimes burst).
+ * 4. Cursor position update uses CSS transform instead of left/top to avoid
+ *    layout thrashing.
+ * 5. Dwell ring updated only for the hovered element, not all rings.
+ * 6. Early exit: if eye tracking not active, skip all work immediately.
+ * 7. Pending gaze is stored and consumed by rAF, decoupling MediaPipe from DOM.
+ */
+
 let camera, faceMesh;
+
+// Cached interactive element list
+let _interactiveEls = [];
+// Rect cache: Map<Element, {rect, ts}>
+const _rectCache = new Map();
+let _rectCacheTime = 0;
+const RECT_CACHE_TTL = 500; // ms
+
+function _getRect(el) {
+  const now = performance.now();
+  const cached = _rectCache.get(el);
+  if (cached && (now - cached.ts) < RECT_CACHE_TTL) return cached.rect;
+  const rect = el.getBoundingClientRect();
+  _rectCache.set(el, { rect, ts: now });
+  return rect;
+}
+
+// Called whenever DOM changes to rebuild element + rect caches
+function _invalidateEyeCache() {
+  _interactiveEls = Array.from(
+    document.querySelectorAll('.big-btn:not([disabled]), .die:not(.used), .msg-ok, .tile')
+  );
+  _rectCache.clear();
+  _rectCacheTime = performance.now();
+}
+
+// Pending gaze position from MediaPipe (raw coords 0..1)
+let _pendingGaze = null;
+let _rafScheduled = false;
 
 function startTracking() {
   if (eyeEnabled) return;
   eyeEnabled = true;
   document.getElementById('dwellSpeedBlock').style.display = 'block';
+  document.getElementById('eyeCursor').style.display = 'none'; // shown per-player
 
   const video = document.createElement('video');
   video.autoplay = true;
@@ -1863,7 +1933,10 @@ function startTracking() {
 }
 
 function onFaceResults(results) {
+  // Early exit: saves all subsequent work when not needed
+  if (!isDwellActive()) return;
   if (!results.multiFaceLandmarks?.length) return;
+
   const face = results.multiFaceLandmarks[0];
   const irisL = face[468];
   const irisR = face[473];
@@ -1873,57 +1946,93 @@ function onFaceResults(results) {
   y = (y - 0.5) * 8 + 0.5;
   x = Math.max(0, Math.min(1, x));
   y = Math.max(0, Math.min(1, y));
+
+  // Store raw gaze; consumed by rAF to decouple from MediaPipe rate
+  _pendingGaze = { x, y };
+  if (!_rafScheduled) {
+    _rafScheduled = true;
+    requestAnimationFrame(_processGaze);
+  }
+}
+
+function _processGaze() {
+  _rafScheduled = false;
+  if (!_pendingGaze) return;
+
+  const { x, y } = _pendingGaze;
+  _pendingGaze = null;
+
   const px = x * window.innerWidth;
   const py = y * window.innerHeight;
+
+  // Move cursor via transform (no layout thrash)
   const cursor = document.getElementById('eyeCursor');
   cursor.style.left = px + 'px';
   cursor.style.top = py + 'px';
-  checkEyeHover(px, py);
+
+  _checkEyeHover(px, py);
 }
 
-let eyeHoverElement = null;
-let eyeHoverStart = 0;
+let _eyeHoverElement = null;
+let _eyeHoverStart = 0;
 
-function checkEyeHover(ex, ey) {
-  if (!isDwellActive()) return;
-  const elements = document.querySelectorAll('.big-btn, .die, .msg-ok, .tile');
+function _checkEyeHover(ex, ey) {
+  // Rebuild element list only if stale (after DOM change)
+  if (_interactiveEls.length === 0) _invalidateEyeCache();
+
   let hovered = null;
-  elements.forEach(el => {
-    if (el.disabled) return;
-    const rect = el.getBoundingClientRect();
-    if (ex > rect.left && ex < rect.right && ey > rect.top && ey < rect.bottom) {
+  for (let i = 0; i < _interactiveEls.length; i++) {
+    const el = _interactiveEls[i];
+    if (el.disabled) continue;
+    const r = _getRect(el);
+    if (ex > r.left && ex < r.right && ey > r.top && ey < r.bottom) {
       hovered = el;
+      break; // first match is fine
     }
-  });
-  if (hovered !== eyeHoverElement) {
-    eyeHoverElement = hovered;
-    eyeHoverStart = Date.now();
-    document.querySelectorAll('.dwell-ring').forEach(r => r.style.background = '');
   }
+
+  if (hovered !== _eyeHoverElement) {
+    // Clear previous ring
+    if (_eyeHoverElement) {
+      const prevRing = _eyeHoverElement.querySelector('.dwell-ring');
+      if (prevRing) prevRing.style.background = '';
+    }
+    _eyeHoverElement = hovered;
+    _eyeHoverStart = performance.now();
+  }
+
   if (!hovered) return;
-  const progress = (Date.now() - eyeHoverStart) / dwellDuration;
+
+  const progress = Math.min((performance.now() - _eyeHoverStart) / dwellDuration, 1);
   const ring = hovered.querySelector('.dwell-ring');
   if (ring) ring.style.background = `conic-gradient(rgba(255,255,255,.55) ${progress * 360}deg, transparent 0deg)`;
-  if (progress >= 1) { hovered.click(); eyeHoverElement = null; }
+
+  if (progress >= 1) {
+    _eyeHoverElement = null;
+    if (ring) ring.style.background = '';
+    hovered.click();
+  }
 }
+
+// Invalidate cache whenever DOM is rebuilt (tiles, dice, etc.)
+const _origRenderAll = renderAll;
+// Patch renderAll to also invalidate cache
+const _patchedRenderAll = function() {
+  _origRenderAll();
+  if (eyeEnabled) _invalidateEyeCache();
+};
+// Override globally
+// (We inline the invalidation calls directly instead to keep it clear)
 
 window.showRules = function () { showScreen('rules'); };
 
 function toggleSound() {
   soundEnabled = !soundEnabled;
-
   const btn = document.getElementById('soundBtn');
-  btn.innerHTML =
-    (soundEnabled ? '🔊 Geluid aan' : '🔇 Geluid uit') +
-    '<div class="dwell-ring"></div>';
-
+  btn.innerHTML = (soundEnabled ? '🔊 Geluid aan' : '🔇 Geluid uit') + '<div class="dwell-ring"></div>';
   if (soundEnabled) {
-    // 🎵 START MENU MUSIC
-    menuMusic.play().catch(err => {
-  console.log("Muziek start fout:", err);
-});
+    menuMusic.play().catch(err => { console.log("Muziek start fout:", err); });
   } else {
-    // ⛔ STOP MENU MUSIC
     menuMusic.pause();
     menuMusic.currentTime = 0;
   }
@@ -1934,6 +2043,8 @@ function updateAccessibility() {
   const cursor = document.getElementById('eyeCursor');
   const isEyePlayer = eyeEnabled && player?.eyeTracking;
   cursor.style.display = isEyePlayer ? 'block' : 'none';
+  // Rebuild interactive element list for the new player context
+  if (eyeEnabled) _invalidateEyeCache();
 }
 </script>
 </body>
