@@ -14,25 +14,7 @@
 :root{
   --sky1:#4ec3f7;
   --sky2:#81d4fa;
-  --grass1:#5cb85c;function toggleSound() {
-    soundEnabled = !soundEnabled;
-
-    if (soundEnabled) {
-        rollSound.muted = false;
-        sparkleSound.muted = false;
-
-        menuMusic.play().catch(err => {
-            console.log("Muziek kon niet starten:", err);
-        });
-
-    } else {
-        rollSound.muted = true;
-        sparkleSound.muted = true;
-
-        menuMusic.pause();
-        menuMusic.currentTime = 0;
-    }
-}
+  --grass1:#5cb85c;
   --grass2:#3d8b3d;
   --dirt1:#8B6914;
   --dirt2:#6B4F0F;
@@ -54,7 +36,6 @@ body{
   position:relative;
 }
 
-/* ═══════════════════════ WORLD BACKGROUND ═══════════════════════ */
 .world-bg{
   position:fixed;
   inset:0;
@@ -63,7 +44,6 @@ body{
   pointer-events:none;
 }
 
-/* Sky gradient */
 .sky-layer{
   position:absolute;
   inset:0;
@@ -77,7 +57,6 @@ body{
   );
 }
 
-/* Sun */
 .sun{
   position:absolute;
   top:6%;
@@ -94,7 +73,6 @@ body{
   50%{box-shadow:0 0 80px 40px rgba(255,220,0,0.6),0 0 150px 80px rgba(255,180,0,0.3);}
 }
 
-/* Sun rays */
 .sun-rays{
   position:absolute;
   top:6%;
@@ -118,7 +96,6 @@ body{
 }
 @keyframes rotateSun{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 
-/* Clouds */
 .cloud{
   position:absolute;
   background:#fff;
@@ -147,7 +124,6 @@ body{
 .cloud-4::after{width:40px;height:40px;top:-18px;left:52px;}
 @keyframes cloudDrift{from{transform:translateX(0);}to{transform:translateX(calc(100vw + 400px));}}
 
-/* Far hills (distant, hazy) */
 .hills-far{
   position:absolute;
   bottom:30%;
@@ -162,7 +138,6 @@ body{
   opacity:0.6;
 }
 
-/* Near hills */
 .hills-near{
   position:absolute;
   bottom:22%;
@@ -176,7 +151,6 @@ body{
     radial-gradient(ellipse 380px 200px at 92% 100%, #57b757 0%, transparent 100%);
 }
 
-/* Grass strip */
 .grass-strip{
   position:absolute;
   bottom:18%;
@@ -186,7 +160,6 @@ body{
   border-radius:60% 60% 0 0 / 40px 40px 0 0;
 }
 
-/* Ground */
 .ground-layer{
   position:absolute;
   bottom:0;
@@ -195,7 +168,6 @@ body{
   background:linear-gradient(180deg,#7bc96f 0%,#5cb85c 8%,#8B6914 12%,#6B4F0F 40%,#5a3e0c 100%);
 }
 
-/* Dirt texture bumps */
 .dirt-bumps{
   position:absolute;
   bottom:18%;
@@ -210,7 +182,6 @@ body{
     radial-gradient(ellipse 90px 22px at 88% 70%,#6B4F0F 0%,transparent 100%);
 }
 
-/* Grass tufts */
 .grass-tufts{
   position:absolute;
   bottom:21%;
@@ -243,10 +214,8 @@ body{
     radial-gradient(ellipse 8px 19px at 96% 100%,#56c156 0%,transparent 100%);
 }
 
-/* Decorations: flowers, mushrooms, rocks */
 .deco{position:absolute;pointer-events:none;}
 
-/* Worm mascots in background */
 .bg-worm{
   position:absolute;
   font-size:2rem;
@@ -260,11 +229,9 @@ body{
   50%{transform:rotate(5deg) translateY(-5px);}
 }
 
-/* ═══════════════════════ SCREENS ═══════════════════════ */
 .screen{display:none;}
 .screen.active{display:block;}
 
-/* ═══════════════════════ SETUP SCREEN ═══════════════════════ */
 #setup{
   max-width:580px;
   margin:0 auto;
@@ -307,7 +274,6 @@ body{
   text-transform:uppercase;
 }
 
-/* Setup card */
 .card{
   background:linear-gradient(160deg,#fffef5 0%,#fdf6e3 60%,#fbefd0 100%);
   border-radius:28px;
@@ -398,7 +364,6 @@ body{
 }
 .name-input:focus{border-color:#FFD700;box-shadow:0 0 0 3px rgba(255,215,0,0.2);}
 
-/* Big buttons */
 .big-btn{
   width:100%;
   padding:16px 20px;
@@ -478,7 +443,6 @@ body{
 .btn-red:not(:disabled):hover{box-shadow:0 8px 0 #922b21, 0 12px 25px rgba(231,76,60,0.5);}
 .btn-red:not(:disabled):active{box-shadow:0 2px 0 #922b21;}
 
-/* Dwell ring */
 .dwell-ring{
   position:absolute;
   inset:0;
@@ -488,7 +452,6 @@ body{
   opacity:1;
 }
 
-/* Speed block */
 .dwell-speed-block{
   margin-top:1.25rem;
   background:rgba(139,94,10,0.12);
@@ -513,7 +476,6 @@ body{
 }
 .speed-btn.active{background:rgba(255,183,0,0.2);color:#6B4500;border-color:rgba(200,144,26,0.7);}
 
-/* ═══════════════════════ RULES SCREEN ═══════════════════════ */
 #rules{max-width:600px;margin:0 auto;padding:2rem 1rem;text-align:center;}
 #rules .card{text-align:left;line-height:1.7;font-size:.95rem;}
 #rules h3{
@@ -526,7 +488,6 @@ body{
 }
 #rules h3:first-child{margin-top:0;}
 
-/* ═══════════════════════ GAME SCREEN ═══════════════════════ */
 #game{
   max-width:980px;
   margin:0 auto;
@@ -536,7 +497,6 @@ body{
   gap:.85rem;
 }
 
-/* Game Header */
 .g-header{
   background:linear-gradient(135deg,
     rgba(10,30,80,0.88) 0%,
@@ -597,7 +557,6 @@ body{
   text-shadow:0 2px 6px rgba(0,0,0,0.3);
 }
 
-/* Section containers */
 .g-section{
   background:linear-gradient(160deg,
     rgba(10,30,80,0.75) 0%,
@@ -619,7 +578,6 @@ body{
   margin-bottom:10px;
 }
 
-/* ═══════════════════════ TILES ═══════════════════════ */
 .tile-row{
   display:flex;
   flex-wrap:wrap;
@@ -694,7 +652,6 @@ body{
   color:#6B3500;
 }
 
-/* ═══════════════════════ DICE CARD ═══════════════════════ */
 .dice-card{
   background:linear-gradient(160deg,#fffef5 0%,#fdf6e3 60%,#f9f0d0 100%);
   border-radius:22px;
@@ -736,7 +693,6 @@ body{
   margin-bottom:8px;
 }
 
-/* Dice row */
 .dice-row{
   display:flex;
   flex-wrap:wrap;
@@ -812,7 +768,6 @@ body{
   border-radius:inherit;
 }
 
-/* Roll animation */
 @keyframes rollAnim{
   0%{transform:rotate(0) scale(1);}
   15%{transform:rotate(-18deg) scale(1.15) translateY(-10px);}
@@ -824,7 +779,6 @@ body{
 }
 .die.rolling{animation:rollAnim .55s cubic-bezier(.23,1,.32,1);}
 
-/* Chosen area */
 .chosen-area{
   display:flex;
   flex-wrap:wrap;
@@ -873,14 +827,12 @@ body{
   100%{transform:scale(1) rotate(0);}
 }
 
-/* Action row */
 .action-row{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
 }
 
-/* ═══════════════════════ PLAYERS GRID ═══════════════════════ */
 .players-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
@@ -969,7 +921,6 @@ body{
   margin-top:3px;
 }
 
-/* ═══════════════════════ OVERLAY / MODAL ═══════════════════════ */
 #overlay{
   position:fixed;inset:0;
   background:rgba(0,0,20,0.8);
@@ -1040,7 +991,6 @@ body{
 .msg-ok:hover{transform:translateY(-3px);box-shadow:0 8px 0 #1a9e52,0 12px 25px rgba(46,204,113,0.45);}
 .msg-ok:active{transform:scale(.97);box-shadow:0 2px 0 #1a9e52;}
 
-/* ═══════════════════════ GAME OVER ═══════════════════════ */
 #gameover{
   max-width:580px;
   margin:0 auto;
@@ -1085,7 +1035,6 @@ body{
 .rank-worms{font-family:'Fredoka One',sans-serif;font-size:1.3rem;color:#c8901a;}
 .rank-row.first .rank-worms{color:#6B3500;}
 
-/* ═══════════════════════ EYE CURSOR ═══════════════════════ */
 #eyeCursor{
   position:fixed;
   width:26px;height:26px;
@@ -1097,9 +1046,10 @@ body{
   transform:translate(-50%,-50%);
   display:none;
   box-shadow:0 0 15px rgba(0,229,255,0.8);
+  /* Use will-change to keep cursor on its own compositor layer */
+  will-change:transform;
 }
 
-/* ═══════════════════════ PARTICLES ═══════════════════════ */
 #particles-container{
   position:fixed;
   inset:0;
@@ -1128,7 +1078,6 @@ body{
   100%{transform:translate(var(--dx),var(--dy)) scale(0) rotate(360deg);opacity:0;}
 }
 
-/* ═══════════════════════ MISC HELPERS ═══════════════════════ */
 .eye-check{margin-right:6px;accent-color:#2ecc71;}
 
 @keyframes bounceIn{
@@ -1137,7 +1086,6 @@ body{
   100%{transform:scale(1) rotate(0);opacity:1;}
 }
 
-/* Score pop */
 .score-pop{
   position:fixed;
   font-family:'Fredoka One',sans-serif;
@@ -1154,7 +1102,6 @@ body{
   100%{transform:scale(1) translateY(-100px);opacity:0;}
 }
 
-/* Worm pop (for stealing) */
 @keyframes wormDance{
   0%{transform:scale(0) rotate(-20deg);}
   40%{transform:scale(1.4) rotate(10deg);}
@@ -1163,7 +1110,6 @@ body{
 }
 .worm-dance{animation:wormDance .6s cubic-bezier(.34,1.56,.64,1);}
 
-/* Responsive tweaks */
 @media(max-width:600px){
   .logo{font-size:3rem;}
   .g-header{flex-wrap:wrap;gap:8px;padding:10px 14px;}
@@ -1176,7 +1122,6 @@ body{
 </head>
 <body>
 
-<!-- World background -->
 <div class="world-bg">
   <div class="sky-layer"></div>
   <div class="sun"></div>
@@ -1191,11 +1136,9 @@ body{
   <div class="grass-tufts"></div>
   <div class="ground-layer"></div>
   <div class="dirt-bumps"></div>
-  <!-- background worm decorations -->
   <div class="bg-worm" style="bottom:28%;left:3%;font-size:1.8rem;">🐛</div>
   <div class="bg-worm" style="bottom:24%;left:55%;font-size:2.2rem;">🐛</div>
   <div class="bg-worm" style="bottom:26%;right:5%;font-size:1.6rem;">🐛</div>
-  <!-- Flowers -->
   <div style="position:absolute;bottom:22%;left:8%;font-size:1.6rem;opacity:0.7;animation:wormWiggle 4s ease-in-out infinite;">🌼</div>
   <div style="position:absolute;bottom:22%;left:25%;font-size:1.4rem;opacity:0.7;animation:wormWiggle 3.5s ease-in-out infinite;animation-delay:-1s;">🌸</div>
   <div style="position:absolute;bottom:22%;left:45%;font-size:1.6rem;opacity:0.6;animation:wormWiggle 4.5s ease-in-out infinite;animation-delay:-.5s;">🌻</div>
@@ -1206,13 +1149,10 @@ body{
   <div style="position:absolute;bottom:23%;left:15%;font-size:1.2rem;opacity:0.5;">🪨</div>
 </div>
 
-<!-- Particles container -->
 <div id="particles-container"></div>
-
-<!-- Eye cursor -->
 <div id="eyeCursor"></div>
 
-<!-- ════════════════════════ SETUP ════════════════════════ -->
+<!-- SETUP -->
 <div id="setup" class="screen active">
   <div class="logo-worm">🐛</div>
   <div class="logo">Regenwormen</div>
@@ -1250,7 +1190,7 @@ body{
   </div>
 </div>
 
-<!-- ════════════════════════ RULES ════════════════════════ -->
+<!-- RULES -->
 <div id="rules" class="screen">
   <div class="card">
     <div class="logo" style="font-size:2.5rem;margin-bottom:1rem;">📜 Spelregels</div>
@@ -1302,7 +1242,7 @@ body{
   </button>
 </div>
 
-<!-- ════════════════════════ GAME ════════════════════════ -->
+<!-- GAME -->
 <div id="game" class="screen">
   <div class="g-header">
     <div>
@@ -1345,7 +1285,7 @@ body{
   <div class="players-grid" id="playersGrid"></div>
 </div>
 
-<!-- ════════════════════════ GAME OVER ════════════════════════ -->
+<!-- GAME OVER -->
 <div id="gameover" class="screen">
   <div class="logo-worm" style="font-size:4rem;">🏆</div>
   <div class="go-title">Einde spel!</div>
@@ -1355,7 +1295,7 @@ body{
   </button>
 </div>
 
-<!-- ════════════════════════ OVERLAY ════════════════════════ -->
+<!-- OVERLAY -->
 <div id="overlay">
   <div class="msg-box">
     <span class="msg-icon" id="mIcon">😢</span>
@@ -1406,12 +1346,11 @@ function applyDwell(el, callback) {
 /* ========================= AUDIO ========================= */
 const rollSound = new Audio('dice.mp3');
 const sparkleSound = new Audio('sparkle.mp3');
-
 const menuMusic = new Audio('menu-music.mp3.wav');
 menuMusic.loop = true;
 menuMusic.volume = 0.25;
+let soundEnabled = false;
 
-let soundEnabled = false; // 🔇 standaard uit
 /* ========================= PARTICLES ========================= */
 function spawnParticles(x, y, count, colors, emojis) {
   const container = document.getElementById('particles-container');
@@ -1485,12 +1424,10 @@ function buildNames() {
   for (let i = 0; i < numPlayers; i++) {
     const wrapper = document.createElement('div');
     wrapper.className = 'player-setup';
-
     const inp = document.createElement('input');
     inp.className = 'name-input';
     inp.placeholder = defNames[i];
     inp.value = prev[i] || '';
-
     const eyeRow = document.createElement('div');
     eyeRow.style.marginTop = '8px';
     const eyeCheck = document.createElement('input');
@@ -1501,7 +1438,6 @@ function buildNames() {
     eyeLabel.style.cssText = 'font-size:.85rem;color:#8B5E0A;font-weight:700;cursor:pointer;';
     eyeRow.appendChild(eyeCheck);
     eyeRow.appendChild(eyeLabel);
-
     wrapper.appendChild(inp);
     wrapper.appendChild(eyeRow);
     el.appendChild(wrapper);
@@ -1521,7 +1457,6 @@ function startGame() {
   showScreen('game');
   renderAll();
   updateAccessibility();
-  // welcome particles
   setTimeout(() => spawnParticles(window.innerWidth/2, window.innerHeight/2, 20, ['#FFD700','#FFA500','#2ecc71','#3498db'], ['🐛','⭐','🎲']), 300);
 }
 
@@ -1537,6 +1472,8 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const el = document.getElementById(id);
   if (el) el.classList.add('active');
+  // Invalidate element cache on screen change
+  eyeElementCache = null;
 }
 
 function setInstruction(msg) { document.getElementById('instruction').textContent = msg; }
@@ -1548,7 +1485,6 @@ function pWorms(p) { return p.tiles.reduce((s, t) => s + wormValue(t), 0); }
 /* ========================= TILE CLICK ========================= */
 function clickTile(tileNum, el) {
   if (!tableTiles.includes(tileNum)) return;
-  // particle burst on the tile
   if (el) {
     const rect = el.getBoundingClientRect();
     const cx = rect.left + rect.width/2;
@@ -1578,6 +1514,8 @@ function doRoll() {
   }
   renderDiceArea(true);
   updateButtons();
+  // Invalidate cache after DOM change
+  eyeElementCache = null;
   setInstruction(`Klik op een dobbelsteen (${remaining} over)`);
 }
 
@@ -1586,7 +1524,6 @@ function lockValue(value, dieEl) {
   if (locked.includes(value)) return;
   if (!dice.includes(value)) return;
   if (value === 'W' && soundEnabled) { sparkleSound.currentTime = 0; sparkleSound.play().catch(()=>{}); }
-  // particle burst
   if (dieEl) {
     const rect = dieEl.getBoundingClientRect();
     const cx = rect.left + rect.width/2;
@@ -1602,6 +1539,8 @@ function lockValue(value, dieEl) {
   renderDiceArea();
   renderChosen();
   updateHeader();
+  // Invalidate cache after DOM change
+  eyeElementCache = null;
   if (chosenDice.length === 8) {
     updateButtons();
     setInstruction('Alle dobbelstenen gekozen!');
@@ -1620,7 +1559,6 @@ function doStop() {
   }
   const score = turnScore();
 
-  // Steal
   for (let i = 0; i < players.length; i++) {
     if (i === currentPlayer) continue;
     const p = players[i];
@@ -1633,7 +1571,6 @@ function doStop() {
     }
   }
 
-  // Exact match
   if (tableTiles.includes(score)) {
     tableTiles = tableTiles.filter(t => t !== score);
     players[currentPlayer].tiles.push(score);
@@ -1641,7 +1578,6 @@ function doStop() {
     return;
   }
 
-  // Highest lower
   const lower = tableTiles.filter(t => t < score);
   if (lower.length > 0) {
     const best = lower[lower.length - 1];
@@ -1687,6 +1623,8 @@ function nextTurn() {
   resetTurn();
   renderAll();
   updateAccessibility();
+  // Invalidate element cache after full re-render
+  eyeElementCache = null;
 }
 
 /* ========================= OVERLAY ========================= */
@@ -1697,10 +1635,12 @@ function showOverlay(icon, title, text, cb) {
   document.getElementById('mText').textContent = text;
   overlayCallback = cb;
   document.getElementById('overlay').classList.add('show');
+  eyeElementCache = null;
   renderAll();
 }
 function closeOverlay() {
   document.getElementById('overlay').classList.remove('show');
+  eyeElementCache = null;
   if (overlayCallback) { const fn = overlayCallback; overlayCallback = null; fn(); }
 }
 
@@ -1712,6 +1652,8 @@ function renderAll() {
   renderPlayers();
   updateHeader();
   updateButtons();
+  // Invalidate element cache whenever DOM is fully re-rendered
+  eyeElementCache = null;
 }
 
 function renderTiles() {
@@ -1821,7 +1763,6 @@ function renderGameOver() {
     `;
     list.appendChild(row);
   });
-  // Confetti for winner
   setTimeout(() => {
     for (let i = 0; i < 5; i++) {
       setTimeout(() => {
@@ -1837,8 +1778,32 @@ function renderGameOver() {
   }, 500);
 }
 
-/* ========================= EYE TRACKING ========================= */
+/* ========================= EYE TRACKING — PERFORMANCE FIXED ========================= */
+/*
+ * Key fixes:
+ * 1. onFaceResults only stores landmark data, does NO DOM work at all.
+ * 2. A single rAF loop handles cursor movement + dwell hit-testing.
+ *    This keeps face mesh processing and rendering completely separate.
+ * 3. Element rects are cached and only recomputed when eyeElementCache === null
+ *    (set whenever the DOM changes via renderAll / screen transitions / etc.)
+ * 4. Cursor uses CSS transform instead of left/top to avoid layout reflows.
+ */
+
 let camera, faceMesh;
+
+// Latest eye position from face mesh (updated off rAF)
+let latestEyeX = -1;
+let latestEyeY = -1;
+let eyeRafRunning = false;
+
+// Cached element list with pre-computed rects
+let eyeElementCache = null; // null = dirty, needs rebuild
+
+function buildEyeElementCache() {
+  const selector = '.big-btn:not(:disabled), .die:not(.used), .msg-ok, .tile';
+  const els = [...document.querySelectorAll(selector)];
+  eyeElementCache = els.map(el => ({ el, rect: el.getBoundingClientRect() }));
+}
 
 function startTracking() {
   if (eyeEnabled) return;
@@ -1860,8 +1825,15 @@ function startTracking() {
     width: 640, height: 480
   });
   camera.start();
+
+  // Start the single rAF loop
+  if (!eyeRafRunning) {
+    eyeRafRunning = true;
+    requestAnimationFrame(eyeRafLoop);
+  }
 }
 
+// onFaceResults: ONLY store coordinates — zero DOM access
 function onFaceResults(results) {
   if (!results.multiFaceLandmarks?.length) return;
   const face = results.multiFaceLandmarks[0];
@@ -1871,59 +1843,77 @@ function onFaceResults(results) {
   let y = ((irisL.y + irisR.y) / 2);
   x = (x - 0.5) * 5 + 0.5;
   y = (y - 0.5) * 8 + 0.5;
-  x = Math.max(0, Math.min(1, x));
-  y = Math.max(0, Math.min(1, y));
-  const px = x * window.innerWidth;
-  const py = y * window.innerHeight;
-  const cursor = document.getElementById('eyeCursor');
-  cursor.style.left = px + 'px';
-  cursor.style.top = py + 'px';
-  checkEyeHover(px, py);
+  latestEyeX = Math.max(0, Math.min(1, x)) * window.innerWidth;
+  latestEyeY = Math.max(0, Math.min(1, y)) * window.innerHeight;
 }
 
+// rAF loop: moves cursor + handles dwell hit-testing, runs at display refresh rate
 let eyeHoverElement = null;
 let eyeHoverStart = 0;
 
-function checkEyeHover(ex, ey) {
+function eyeRafLoop() {
+  if (!eyeEnabled) return; // stop if tracking disabled
+  requestAnimationFrame(eyeRafLoop);
+
+  if (latestEyeX < 0) return; // no data yet
+
+  // Move cursor (transform = no layout reflow)
+  const cursor = document.getElementById('eyeCursor');
+  cursor.style.left = latestEyeX + 'px';
+  cursor.style.top  = latestEyeY + 'px';
+
   if (!isDwellActive()) return;
-  const elements = document.querySelectorAll('.big-btn, .die, .msg-ok, .tile');
+
+  // Rebuild rect cache if dirty (after DOM changes)
+  if (eyeElementCache === null) {
+    buildEyeElementCache();
+  }
+
+  // Hit-test against cached rects
   let hovered = null;
-  elements.forEach(el => {
-    if (el.disabled) return;
-    const rect = el.getBoundingClientRect();
-    if (ex > rect.left && ex < rect.right && ey > rect.top && ey < rect.bottom) {
+  for (let i = 0; i < eyeElementCache.length; i++) {
+    const { el, rect } = eyeElementCache[i];
+    if (latestEyeX > rect.left && latestEyeX < rect.right &&
+        latestEyeY > rect.top  && latestEyeY < rect.bottom) {
       hovered = el;
+      break;
     }
-  });
+  }
+
   if (hovered !== eyeHoverElement) {
+    // Clear old ring
+    if (eyeHoverElement) {
+      const oldRing = eyeHoverElement.querySelector('.dwell-ring');
+      if (oldRing) oldRing.style.background = '';
+    }
     eyeHoverElement = hovered;
     eyeHoverStart = Date.now();
-    document.querySelectorAll('.dwell-ring').forEach(r => r.style.background = '');
   }
+
   if (!hovered) return;
-  const progress = (Date.now() - eyeHoverStart) / dwellDuration;
+
+  const progress = Math.min((Date.now() - eyeHoverStart) / dwellDuration, 1);
   const ring = hovered.querySelector('.dwell-ring');
-  if (ring) ring.style.background = `conic-gradient(rgba(255,255,255,.55) ${progress * 360}deg, transparent 0deg)`;
-  if (progress >= 1) { hovered.click(); eyeHoverElement = null; }
+  if (ring) {
+    ring.style.background = `conic-gradient(rgba(255,255,255,.55) ${progress * 360}deg, transparent 0deg)`;
+  }
+
+  if (progress >= 1) {
+    eyeHoverElement = null;
+    eyeElementCache = null; // DOM will change after click
+    hovered.click();
+  }
 }
 
 window.showRules = function () { showScreen('rules'); };
 
 function toggleSound() {
   soundEnabled = !soundEnabled;
-
   const btn = document.getElementById('soundBtn');
-  btn.innerHTML =
-    (soundEnabled ? '🔊 Geluid aan' : '🔇 Geluid uit') +
-    '<div class="dwell-ring"></div>';
-
+  btn.innerHTML = (soundEnabled ? '🔊 Geluid aan' : '🔇 Geluid uit') + '<div class="dwell-ring"></div>';
   if (soundEnabled) {
-    // 🎵 START MENU MUSIC
-    menuMusic.play().catch(err => {
-  console.log("Muziek start fout:", err);
-});
+    menuMusic.play().catch(err => { console.log("Muziek start fout:", err); });
   } else {
-    // ⛔ STOP MENU MUSIC
     menuMusic.pause();
     menuMusic.currentTime = 0;
   }
@@ -1934,6 +1924,8 @@ function updateAccessibility() {
   const cursor = document.getElementById('eyeCursor');
   const isEyePlayer = eyeEnabled && player?.eyeTracking;
   cursor.style.display = isEyePlayer ? 'block' : 'none';
+  // When switching players, the relevant interactive elements may have changed
+  eyeElementCache = null;
 }
 </script>
 </body>
