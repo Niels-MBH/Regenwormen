@@ -1788,9 +1788,14 @@ function renderGameOver() {
 let faceMesh;
 let eyeVideoEl = null;
 
-// Latest eye gaze coords (written by face mesh, read by rAF loop)
+// Raw eye gaze coords from face mesh
 let latestEyeX = -1;
 let latestEyeY = -1;
+
+// Smoothed cursor position (what actually gets rendered)
+let smoothX = -1;
+let smoothY = -1;
+const SMOOTH = 0.08; // 0=frozen, 1=instant; 0.08 = very smooth/icy
 
 // Cached interactive elements + their rects (null = needs rebuild)
 let eyeElementCache = null;
@@ -1884,9 +1889,14 @@ function eyeRafLoop() {
   requestAnimationFrame(eyeRafLoop);
   if (latestEyeX < 0) return;
 
+  // Exponential smoothing — cursor glides like on ice
+  if (smoothX < 0) { smoothX = latestEyeX; smoothY = latestEyeY; }
+  smoothX += (latestEyeX - smoothX) * SMOOTH;
+  smoothY += (latestEyeY - smoothY) * SMOOTH;
+
   const cursor = document.getElementById('eyeCursor');
-  cursor.style.left = latestEyeX + 'px';
-  cursor.style.top  = latestEyeY + 'px';
+  cursor.style.left = smoothX + 'px';
+  cursor.style.top  = smoothY + 'px';
 
   if (!isDwellActive()) return;
 
@@ -1894,8 +1904,8 @@ function eyeRafLoop() {
 
   let hovered = null;
   for (const { el, rect } of eyeElementCache) {
-    if (latestEyeX > rect.left && latestEyeX < rect.right &&
-        latestEyeY > rect.top  && latestEyeY < rect.bottom) {
+    if (smoothX > rect.left && smoothX < rect.right &&
+        smoothY > rect.top  && smoothY < rect.bottom) {
       hovered = el;
       break;
     }
