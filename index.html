@@ -1795,7 +1795,7 @@ let latestEyeY = -1;
 // Smoothed cursor position (updated 60fps in rAF)
 let smoothX = -1;
 let smoothY = -1;
-const SMOOTH = 0.06; // per rAF frame (~60fps): lower = more glide
+const SMOOTH = 0.1; // per rAF frame (~60fps): lower = more glide
 
 // Cached interactive elements + their rects (null = needs rebuild)
 let eyeElementCache = null;
@@ -1869,7 +1869,7 @@ async function runFaceMesh() {
 // Called by FaceMesh — pre-filter raw coords before storing
 let rawX = -1;
 let rawY = -1;
-const RAW_SMOOTH = 0.3; // smooths the face mesh output itself (reduces noise jumps)
+const RAW_SMOOTH = 0.15; // smooths the face mesh output itself (reduces noise jumps)
 
 function onFaceResults(results) {
   if (!results.multiFaceLandmarks?.length) return;
