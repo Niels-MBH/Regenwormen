@@ -1788,14 +1788,14 @@ function renderGameOver() {
 let faceMesh;
 let eyeVideoEl = null;
 
-// Raw eye gaze coords from face mesh
+// Raw eye gaze coords from face mesh (updated ~10fps)
 let latestEyeX = -1;
 let latestEyeY = -1;
 
-// Smoothed cursor position (what actually gets rendered)
+// Smoothed cursor position (updated 60fps in rAF)
 let smoothX = -1;
 let smoothY = -1;
-const SMOOTH = 0.08; // 0=frozen, 1=instant; 0.08 = very smooth/icy
+const SMOOTH = 0.06; // per rAF frame (~60fps): lower = more glide
 
 // Cached interactive elements + their rects (null = needs rebuild)
 let eyeElementCache = null;
@@ -1866,7 +1866,11 @@ async function runFaceMesh() {
   scheduleFaceMeshFrame();
 }
 
-// Called by FaceMesh — only store coords, zero DOM work
+// Called by FaceMesh — pre-filter raw coords before storing
+let rawX = -1;
+let rawY = -1;
+const RAW_SMOOTH = 0.3; // smooths the face mesh output itself (reduces noise jumps)
+
 function onFaceResults(results) {
   if (!results.multiFaceLandmarks?.length) return;
   const face = results.multiFaceLandmarks[0];
@@ -1874,10 +1878,14 @@ function onFaceResults(results) {
   const irisR = face[473];
   let x = 1 - ((irisL.x + irisR.x) / 2);
   let y = (irisL.y + irisR.y) / 2;
-  x = Math.max(0, Math.min(1, (x - 0.5) * 5 + 0.5));
-  y = Math.max(0, Math.min(1, (y - 0.5) * 8 + 0.5));
-  latestEyeX = x * window.innerWidth;
-  latestEyeY = y * window.innerHeight;
+  x = Math.max(0, Math.min(1, (x - 0.5) * 5 + 0.5)) * window.innerWidth;
+  y = Math.max(0, Math.min(1, (y - 0.5) * 8 + 0.5)) * window.innerHeight;
+  // First-pass smoothing on raw data to kill landmark jitter
+  if (rawX < 0) { rawX = x; rawY = y; }
+  rawX += (x - rawX) * RAW_SMOOTH;
+  rawY += (y - rawY) * RAW_SMOOTH;
+  latestEyeX = rawX;
+  latestEyeY = rawY;
 }
 
 // rAF loop: only moves cursor + dwell ring — very cheap, no layout reflow
