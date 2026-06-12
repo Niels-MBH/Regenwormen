@@ -87,7 +87,7 @@ body{
   border-radius:50%;
   background:radial-gradient(circle,#fff7a1 0%,#ffe066 40%,#ffc300 70%,#ff9900 100%);
   box-shadow:0 0 60px 30px rgba(255,220,0,0.45), 0 0 120px 60px rgba(255,180,0,0.2);
-  animation:sunPulse 4s ease-in-out infinite;
+  animation:none 
 }
 @keyframes sunPulse{
   0%,100%{box-shadow:0 0 60px 30px rgba(255,220,0,0.45),0 0 120px 60px rgba(255,180,0,0.2);}
@@ -101,7 +101,7 @@ body{
   right:12%;
   width:90px;
   height:90px;
-  animation:rotateSun 20s linear infinite;
+  animation:none
 }
 .sun-rays::before,.sun-rays::after{
   content:'';
@@ -124,7 +124,7 @@ body{
   background:#fff;
   border-radius:50px;
   opacity:0.92;
-  animation:cloudDrift linear infinite;
+  animation:none
   filter:drop-shadow(0 8px 16px rgba(0,0,0,0.1));
 }
 .cloud::before,.cloud::after{
