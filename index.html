@@ -14,25 +14,7 @@
 :root{
   --sky1:#4ec3f7;
   --sky2:#81d4fa;
-  --grass1:#5cb85c;function toggleSound() {
-    soundEnabled = !soundEnabled;
-
-    if (soundEnabled) {
-        rollSound.muted = false;
-        sparkleSound.muted = false;
-
-        menuMusic.play().catch(err => {
-            console.log("Muziek kon niet starten:", err);
-        });
-
-    } else {
-        rollSound.muted = true;
-        sparkleSound.muted = true;
-
-        menuMusic.pause();
-        menuMusic.currentTime = 0;
-    }
-}
+  --grass1:#5cb85c;
   --grass2:#3d8b3d;
   --dirt1:#8B6914;
   --dirt2:#6B4F0F;
@@ -63,7 +45,6 @@ body{
   pointer-events:none;
 }
 
-/* Sky gradient */
 .sky-layer{
   position:absolute;
   inset:0;
@@ -77,7 +58,6 @@ body{
   );
 }
 
-/* Sun */
 .sun{
   position:absolute;
   top:6%;
@@ -94,7 +74,6 @@ body{
   50%{box-shadow:0 0 80px 40px rgba(255,220,0,0.6),0 0 150px 80px rgba(255,180,0,0.3);}
 }
 
-/* Sun rays */
 .sun-rays{
   position:absolute;
   top:6%;
@@ -118,7 +97,6 @@ body{
 }
 @keyframes rotateSun{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 
-/* Clouds */
 .cloud{
   position:absolute;
   background:#fff;
@@ -147,7 +125,6 @@ body{
 .cloud-4::after{width:40px;height:40px;top:-18px;left:52px;}
 @keyframes cloudDrift{from{transform:translateX(0);}to{transform:translateX(calc(100vw + 400px));}}
 
-/* Far hills (distant, hazy) */
 .hills-far{
   position:absolute;
   bottom:30%;
@@ -162,7 +139,6 @@ body{
   opacity:0.6;
 }
 
-/* Near hills */
 .hills-near{
   position:absolute;
   bottom:22%;
@@ -176,7 +152,6 @@ body{
     radial-gradient(ellipse 380px 200px at 92% 100%, #57b757 0%, transparent 100%);
 }
 
-/* Grass strip */
 .grass-strip{
   position:absolute;
   bottom:18%;
@@ -186,7 +161,6 @@ body{
   border-radius:60% 60% 0 0 / 40px 40px 0 0;
 }
 
-/* Ground */
 .ground-layer{
   position:absolute;
   bottom:0;
@@ -195,7 +169,6 @@ body{
   background:linear-gradient(180deg,#7bc96f 0%,#5cb85c 8%,#8B6914 12%,#6B4F0F 40%,#5a3e0c 100%);
 }
 
-/* Dirt texture bumps */
 .dirt-bumps{
   position:absolute;
   bottom:18%;
@@ -210,7 +183,6 @@ body{
     radial-gradient(ellipse 90px 22px at 88% 70%,#6B4F0F 0%,transparent 100%);
 }
 
-/* Grass tufts */
 .grass-tufts{
   position:absolute;
   bottom:21%;
@@ -243,10 +215,6 @@ body{
     radial-gradient(ellipse 8px 19px at 96% 100%,#56c156 0%,transparent 100%);
 }
 
-/* Decorations: flowers, mushrooms, rocks */
-.deco{position:absolute;pointer-events:none;}
-
-/* Worm mascots in background */
 .bg-worm{
   position:absolute;
   font-size:2rem;
@@ -258,6 +226,23 @@ body{
 @keyframes wormWiggle{
   0%,100%{transform:rotate(-5deg) translateY(0);}
   50%{transform:rotate(5deg) translateY(-5px);}
+}
+
+/* ═══════════════════════ GAMEPLAY: ANIMATIES UIT ═══════════════════════ */
+/* Wanneer body de class .gameplay-active heeft, worden alle
+   achtergrond- en decoratieve animaties stilgezet. */
+body.gameplay-active .sun,
+body.gameplay-active .sun-rays,
+body.gameplay-active .cloud,
+body.gameplay-active .bg-worm,
+body.gameplay-active .world-bg [style*="animation"] {
+  animation-play-state: paused !important;
+  animation: none !important;
+}
+
+/* Extra selector voor inline-gestijlde decoraties (bloemen, paddenstoelen, stenen) */
+body.gameplay-active .world-bg > div[style] {
+  animation: none !important;
 }
 
 /* ═══════════════════════ SCREENS ═══════════════════════ */
@@ -307,7 +292,6 @@ body{
   text-transform:uppercase;
 }
 
-/* Setup card */
 .card{
   background:linear-gradient(160deg,#fffef5 0%,#fdf6e3 60%,#fbefd0 100%);
   border-radius:28px;
@@ -398,7 +382,6 @@ body{
 }
 .name-input:focus{border-color:#FFD700;box-shadow:0 0 0 3px rgba(255,215,0,0.2);}
 
-/* Big buttons */
 .big-btn{
   width:100%;
   padding:16px 20px;
@@ -478,7 +461,6 @@ body{
 .btn-red:not(:disabled):hover{box-shadow:0 8px 0 #922b21, 0 12px 25px rgba(231,76,60,0.5);}
 .btn-red:not(:disabled):active{box-shadow:0 2px 0 #922b21;}
 
-/* Dwell ring */
 .dwell-ring{
   position:absolute;
   inset:0;
@@ -488,7 +470,6 @@ body{
   opacity:1;
 }
 
-/* Speed block */
 .dwell-speed-block{
   margin-top:1.25rem;
   background:rgba(139,94,10,0.12);
@@ -536,7 +517,6 @@ body{
   gap:.85rem;
 }
 
-/* Game Header */
 .g-header{
   background:linear-gradient(135deg,
     rgba(10,30,80,0.88) 0%,
@@ -597,7 +577,6 @@ body{
   text-shadow:0 2px 6px rgba(0,0,0,0.3);
 }
 
-/* Section containers */
 .g-section{
   background:linear-gradient(160deg,
     rgba(10,30,80,0.75) 0%,
@@ -736,7 +715,6 @@ body{
   margin-bottom:8px;
 }
 
-/* Dice row */
 .dice-row{
   display:flex;
   flex-wrap:wrap;
@@ -812,7 +790,6 @@ body{
   border-radius:inherit;
 }
 
-/* Roll animation */
 @keyframes rollAnim{
   0%{transform:rotate(0) scale(1);}
   15%{transform:rotate(-18deg) scale(1.15) translateY(-10px);}
@@ -824,7 +801,6 @@ body{
 }
 .die.rolling{animation:rollAnim .55s cubic-bezier(.23,1,.32,1);}
 
-/* Chosen area */
 .chosen-area{
   display:flex;
   flex-wrap:wrap;
@@ -873,7 +849,6 @@ body{
   100%{transform:scale(1) rotate(0);}
 }
 
-/* Action row */
 .action-row{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -1137,7 +1112,6 @@ body{
   100%{transform:scale(1) rotate(0);opacity:1;}
 }
 
-/* Score pop */
 .score-pop{
   position:fixed;
   font-family:'Fredoka One',sans-serif;
@@ -1154,7 +1128,6 @@ body{
   100%{transform:scale(1) translateY(-100px);opacity:0;}
 }
 
-/* Worm pop (for stealing) */
 @keyframes wormDance{
   0%{transform:scale(0) rotate(-20deg);}
   40%{transform:scale(1.4) rotate(10deg);}
@@ -1163,7 +1136,6 @@ body{
 }
 .worm-dance{animation:wormDance .6s cubic-bezier(.34,1.56,.64,1);}
 
-/* Responsive tweaks */
 @media(max-width:600px){
   .logo{font-size:3rem;}
   .g-header{flex-wrap:wrap;gap:8px;padding:10px 14px;}
@@ -1191,11 +1163,9 @@ body{
   <div class="grass-tufts"></div>
   <div class="ground-layer"></div>
   <div class="dirt-bumps"></div>
-  <!-- background worm decorations -->
   <div class="bg-worm" style="bottom:28%;left:3%;font-size:1.8rem;">🐛</div>
   <div class="bg-worm" style="bottom:24%;left:55%;font-size:2.2rem;">🐛</div>
   <div class="bg-worm" style="bottom:26%;right:5%;font-size:1.6rem;">🐛</div>
-  <!-- Flowers -->
   <div style="position:absolute;bottom:22%;left:8%;font-size:1.6rem;opacity:0.7;animation:wormWiggle 4s ease-in-out infinite;">🌼</div>
   <div style="position:absolute;bottom:22%;left:25%;font-size:1.4rem;opacity:0.7;animation:wormWiggle 3.5s ease-in-out infinite;animation-delay:-1s;">🌸</div>
   <div style="position:absolute;bottom:22%;left:45%;font-size:1.6rem;opacity:0.6;animation:wormWiggle 4.5s ease-in-out infinite;animation-delay:-.5s;">🌻</div>
@@ -1368,6 +1338,16 @@ body{
 </div>
 
 <script>
+/* ========================= GAMEPLAY ANIMATIES ========================= */
+// Schakelt achtergrondanimaties uit tijdens gameplay en weer in bij het menu
+function setGameplayMode(active) {
+  if (active) {
+    document.body.classList.add('gameplay-active');
+  } else {
+    document.body.classList.remove('gameplay-active');
+  }
+}
+
 /* ========================= DWELL ========================= */
 let dwellDuration = 1500;
 let eyeEnabled = false;
@@ -1411,7 +1391,8 @@ const menuMusic = new Audio('menu-music.mp3.wav');
 menuMusic.loop = true;
 menuMusic.volume = 0.25;
 
-let soundEnabled = false; // 🔇 standaard uit
+let soundEnabled = false;
+
 /* ========================= PARTICLES ========================= */
 function spawnParticles(x, y, count, colors, emojis) {
   const container = document.getElementById('particles-container');
@@ -1519,13 +1500,16 @@ function startGame() {
   tableTiles = Array.from({ length: 16 }, (_, i) => 21 + i);
   resetTurn();
   showScreen('game');
+  setGameplayMode(true); // ← achtergrondanimaties uit
   renderAll();
   updateAccessibility();
-  // welcome particles
   setTimeout(() => spawnParticles(window.innerWidth/2, window.innerHeight/2, 20, ['#FFD700','#FFA500','#2ecc71','#3498db'], ['🐛','⭐','🎲']), 300);
 }
 
-function resetGame() { showScreen('setup'); }
+function resetGame() {
+  setGameplayMode(false); // ← achtergrondanimaties weer aan
+  showScreen('setup');
+}
 
 function resetTurn() {
   dice = [];
@@ -1537,6 +1521,10 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const el = document.getElementById(id);
   if (el) el.classList.add('active');
+  // Zorg dat animaties alleen uit zijn tijdens actief spel
+  if (id === 'setup' || id === 'rules') {
+    setGameplayMode(false);
+  }
 }
 
 function setInstruction(msg) { document.getElementById('instruction').textContent = msg; }
@@ -1548,7 +1536,6 @@ function pWorms(p) { return p.tiles.reduce((s, t) => s + wormValue(t), 0); }
 /* ========================= TILE CLICK ========================= */
 function clickTile(tileNum, el) {
   if (!tableTiles.includes(tileNum)) return;
-  // particle burst on the tile
   if (el) {
     const rect = el.getBoundingClientRect();
     const cx = rect.left + rect.width/2;
@@ -1586,7 +1573,6 @@ function lockValue(value, dieEl) {
   if (locked.includes(value)) return;
   if (!dice.includes(value)) return;
   if (value === 'W' && soundEnabled) { sparkleSound.currentTime = 0; sparkleSound.play().catch(()=>{}); }
-  // particle burst
   if (dieEl) {
     const rect = dieEl.getBoundingClientRect();
     const cx = rect.left + rect.width/2;
@@ -1620,7 +1606,6 @@ function doStop() {
   }
   const score = turnScore();
 
-  // Steal
   for (let i = 0; i < players.length; i++) {
     if (i === currentPlayer) continue;
     const p = players[i];
@@ -1633,7 +1618,6 @@ function doStop() {
     }
   }
 
-  // Exact match
   if (tableTiles.includes(score)) {
     tableTiles = tableTiles.filter(t => t !== score);
     players[currentPlayer].tiles.push(score);
@@ -1641,7 +1625,6 @@ function doStop() {
     return;
   }
 
-  // Highest lower
   const lower = tableTiles.filter(t => t < score);
   if (lower.length > 0) {
     const best = lower[lower.length - 1];
@@ -1821,7 +1804,6 @@ function renderGameOver() {
     `;
     list.appendChild(row);
   });
-  // Confetti for winner
   setTimeout(() => {
     for (let i = 0; i < 5; i++) {
       setTimeout(() => {
@@ -1918,12 +1900,10 @@ function toggleSound() {
     '<div class="dwell-ring"></div>';
 
   if (soundEnabled) {
-    // 🎵 START MENU MUSIC
     menuMusic.play().catch(err => {
-  console.log("Muziek start fout:", err);
-});
+      console.log("Muziek start fout:", err);
+    });
   } else {
-    // ⛔ STOP MENU MUSIC
     menuMusic.pause();
     menuMusic.currentTime = 0;
   }
