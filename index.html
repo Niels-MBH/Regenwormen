@@ -36,7 +36,6 @@ body{
   position:relative;
 }
 
-/* ═══════════════════════ WORLD BACKGROUND ═══════════════════════ */
 .world-bg{
   position:fixed;
   inset:0;
@@ -228,9 +227,6 @@ body{
   50%{transform:rotate(5deg) translateY(-5px);}
 }
 
-/* ═══════════════════════ GAMEPLAY: ANIMATIES UIT ═══════════════════════ */
-/* Wanneer body de class .gameplay-active heeft, worden alle
-   achtergrond- en decoratieve animaties stilgezet. */
 body.gameplay-active .sun,
 body.gameplay-active .sun-rays,
 body.gameplay-active .cloud,
@@ -240,16 +236,13 @@ body.gameplay-active .world-bg [style*="animation"] {
   animation: none !important;
 }
 
-/* Extra selector voor inline-gestijlde decoraties (bloemen, paddenstoelen, stenen) */
 body.gameplay-active .world-bg > div[style] {
   animation: none !important;
 }
 
-/* ═══════════════════════ SCREENS ═══════════════════════ */
 .screen{display:none;}
 .screen.active{display:block;}
 
-/* ═══════════════════════ SETUP SCREEN ═══════════════════════ */
 #setup{
   max-width:580px;
   margin:0 auto;
@@ -494,7 +487,6 @@ body.gameplay-active .world-bg > div[style] {
 }
 .speed-btn.active{background:rgba(255,183,0,0.2);color:#6B4500;border-color:rgba(200,144,26,0.7);}
 
-/* ═══════════════════════ RULES SCREEN ═══════════════════════ */
 #rules{max-width:600px;margin:0 auto;padding:2rem 1rem;text-align:center;}
 #rules .card{text-align:left;line-height:1.7;font-size:.95rem;}
 #rules h3{
@@ -507,7 +499,6 @@ body.gameplay-active .world-bg > div[style] {
 }
 #rules h3:first-child{margin-top:0;}
 
-/* ═══════════════════════ GAME SCREEN ═══════════════════════ */
 #game{
   max-width:980px;
   margin:0 auto;
@@ -598,7 +589,6 @@ body.gameplay-active .world-bg > div[style] {
   margin-bottom:10px;
 }
 
-/* ═══════════════════════ TILES ═══════════════════════ */
 .tile-row{
   display:flex;
   flex-wrap:wrap;
@@ -673,7 +663,6 @@ body.gameplay-active .world-bg > div[style] {
   color:#6B3500;
 }
 
-/* ═══════════════════════ DICE CARD ═══════════════════════ */
 .dice-card{
   background:linear-gradient(160deg,#fffef5 0%,#fdf6e3 60%,#f9f0d0 100%);
   border-radius:22px;
@@ -855,7 +844,6 @@ body.gameplay-active .world-bg > div[style] {
   gap:12px;
 }
 
-/* ═══════════════════════ PLAYERS GRID ═══════════════════════ */
 .players-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
@@ -944,7 +932,6 @@ body.gameplay-active .world-bg > div[style] {
   margin-top:3px;
 }
 
-/* ═══════════════════════ OVERLAY / MODAL ═══════════════════════ */
 #overlay{
   position:fixed;inset:0;
   background:rgba(0,0,20,0.8);
@@ -1015,7 +1002,6 @@ body.gameplay-active .world-bg > div[style] {
 .msg-ok:hover{transform:translateY(-3px);box-shadow:0 8px 0 #1a9e52,0 12px 25px rgba(46,204,113,0.45);}
 .msg-ok:active{transform:scale(.97);box-shadow:0 2px 0 #1a9e52;}
 
-/* ═══════════════════════ GAME OVER ═══════════════════════ */
 #gameover{
   max-width:580px;
   margin:0 auto;
@@ -1060,7 +1046,6 @@ body.gameplay-active .world-bg > div[style] {
 .rank-worms{font-family:'Fredoka One',sans-serif;font-size:1.3rem;color:#c8901a;}
 .rank-row.first .rank-worms{color:#6B3500;}
 
-/* ═══════════════════════ EYE CURSOR ═══════════════════════ */
 #eyeCursor{
   position:fixed;
   width:26px;height:26px;
@@ -1074,7 +1059,6 @@ body.gameplay-active .world-bg > div[style] {
   box-shadow:0 0 15px rgba(0,229,255,0.8);
 }
 
-/* ═══════════════════════ PARTICLES ═══════════════════════ */
 #particles-container{
   position:fixed;
   inset:0;
@@ -1103,7 +1087,6 @@ body.gameplay-active .world-bg > div[style] {
   100%{transform:translate(var(--dx),var(--dy)) scale(0) rotate(360deg);opacity:0;}
 }
 
-/* ═══════════════════════ MISC HELPERS ═══════════════════════ */
 .eye-check{margin-right:6px;accent-color:#2ecc71;}
 
 @keyframes bounceIn{
@@ -1148,7 +1131,6 @@ body.gameplay-active .world-bg > div[style] {
 </head>
 <body>
 
-<!-- World background -->
 <div class="world-bg">
   <div class="sky-layer"></div>
   <div class="sun"></div>
@@ -1174,15 +1156,28 @@ body.gameplay-active .world-bg > div[style] {
   <div style="position:absolute;bottom:23%;left:70%;font-size:1.5rem;opacity:0.6;">🪨</div>
   <div style="position:absolute;bottom:22%;left:85%;font-size:1.3rem;opacity:0.55;animation:wormWiggle 3.2s ease-in-out infinite;animation-delay:-1.5s;">🌼</div>
   <div style="position:absolute;bottom:23%;left:15%;font-size:1.2rem;opacity:0.5;">🪨</div>
+
+  <!-- Extra natuurlijke aankleding: kleine/middelgrote/grote bloemetjes en details, niet-overlappend met bestaande items en onderling -->
+  <div style="position:absolute;bottom:22.3%;left:1.5%;font-size:0.8rem;opacity:0.5;">🌱</div>
+  <div style="position:absolute;bottom:21.6%;left:5.5%;font-size:0.95rem;opacity:0.55;animation:wormWiggle 3.6s ease-in-out infinite;animation-delay:-1.2s;">🌷</div>
+  <div style="position:absolute;bottom:23.4%;left:11%;font-size:0.8rem;opacity:0.5;">☘️</div>
+  <div style="position:absolute;bottom:21.5%;left:19%;font-size:1rem;opacity:0.55;animation:wormWiggle 4.1s ease-in-out infinite;animation-delay:-.3s;">🌺</div>
+  <div style="position:absolute;bottom:22.7%;left:31%;font-size:0.8rem;opacity:0.5;">🌱</div>
+  <div style="position:absolute;bottom:21.7%;left:38%;font-size:0.9rem;opacity:0.5;animation:wormWiggle 3.9s ease-in-out infinite;animation-delay:-1.8s;">🌷</div>
+  <div style="position:absolute;bottom:23.5%;left:52%;font-size:0.8rem;opacity:0.45;">☘️</div>
+  <div style="position:absolute;bottom:21.6%;left:60%;font-size:1.7rem;opacity:0.6;animation:wormWiggle 4.6s ease-in-out infinite;animation-delay:-.6s;">🌻</div>
+  <div style="position:absolute;bottom:23.2%;left:66%;font-size:0.8rem;opacity:0.5;">🌱</div>
+  <div style="position:absolute;bottom:21.9%;left:75%;font-size:0.95rem;opacity:0.5;animation:wormWiggle 3.4s ease-in-out infinite;animation-delay:-2.2s;">🌺</div>
+  <div style="position:absolute;bottom:23.6%;left:89%;font-size:0.8rem;opacity:0.45;">☘️</div>
+  <div style="position:absolute;bottom:21.4%;left:94%;font-size:0.9rem;opacity:0.5;animation:wormWiggle 3.7s ease-in-out infinite;animation-delay:-1s;">🌷</div>
+  <div style="position:absolute;bottom:24%;left:42%;font-size:1.1rem;opacity:0.4;animation:wormWiggle 4.3s ease-in-out infinite;animation-delay:-1.6s;">🐛</div>
+  <div style="position:absolute;bottom:24%;left:80%;font-size:1rem;opacity:0.4;animation:wormWiggle 3.3s ease-in-out infinite;animation-delay:-.4s;">🐛</div>
 </div>
 
-<!-- Particles container -->
 <div id="particles-container"></div>
 
-<!-- Eye cursor -->
 <div id="eyeCursor"></div>
 
-<!-- ════════════════════════ SETUP ════════════════════════ -->
 <div id="setup" class="screen active">
   <div class="logo-worm">🐛</div>
   <div class="logo">Regenwormen</div>
@@ -1220,7 +1215,6 @@ body.gameplay-active .world-bg > div[style] {
   </div>
 </div>
 
-<!-- ════════════════════════ RULES ════════════════════════ -->
 <div id="rules" class="screen">
   <div class="card">
     <div class="logo" style="font-size:2.5rem;margin-bottom:1rem;">📜 Spelregels</div>
@@ -1272,7 +1266,6 @@ body.gameplay-active .world-bg > div[style] {
   </button>
 </div>
 
-<!-- ════════════════════════ GAME ════════════════════════ -->
 <div id="game" class="screen">
   <div class="g-header">
     <div>
@@ -1315,7 +1308,6 @@ body.gameplay-active .world-bg > div[style] {
   <div class="players-grid" id="playersGrid"></div>
 </div>
 
-<!-- ════════════════════════ GAME OVER ════════════════════════ -->
 <div id="gameover" class="screen">
   <div class="logo-worm" style="font-size:4rem;">🏆</div>
   <div class="go-title">Einde spel!</div>
@@ -1325,7 +1317,6 @@ body.gameplay-active .world-bg > div[style] {
   </button>
 </div>
 
-<!-- ════════════════════════ OVERLAY ════════════════════════ -->
 <div id="overlay">
   <div class="msg-box">
     <span class="msg-icon" id="mIcon">😢</span>
@@ -1338,8 +1329,6 @@ body.gameplay-active .world-bg > div[style] {
 </div>
 
 <script>
-/* ========================= GAMEPLAY ANIMATIES ========================= */
-// Schakelt achtergrondanimaties uit tijdens gameplay en weer in bij het menu
 function setGameplayMode(active) {
   if (active) {
     document.body.classList.add('gameplay-active');
@@ -1348,7 +1337,6 @@ function setGameplayMode(active) {
   }
 }
 
-/* ========================= DWELL ========================= */
 let dwellDuration = 1500;
 let eyeEnabled = false;
 
@@ -1383,7 +1371,6 @@ function applyDwell(el, callback) {
   });
 }
 
-/* ========================= AUDIO ========================= */
 const rollSound = new Audio('dice.mp3');
 const sparkleSound = new Audio('sparkle.mp3');
 
@@ -1393,7 +1380,6 @@ menuMusic.volume = 0.25;
 
 let soundEnabled = false;
 
-/* ========================= PARTICLES ========================= */
 function spawnParticles(x, y, count, colors, emojis) {
   const container = document.getElementById('particles-container');
   for (let i = 0; i < count; i++) {
@@ -1430,7 +1416,6 @@ function spawnScorePop(x, y, text) {
   setTimeout(() => el.remove(), 1600);
 }
 
-/* ========================= GAME STATE ========================= */
 let players = [];
 let currentPlayer = 0;
 let tableTiles = [];
@@ -1438,7 +1423,6 @@ let dice = [];
 let chosenDice = [];
 let locked = [];
 
-/* ========================= SETUP ========================= */
 let numPlayers = 2;
 const defNames = ['Kristian', 'Anna', 'Boris', 'Carmen', 'David', 'Gina', 'Floris'];
 
@@ -1500,14 +1484,14 @@ function startGame() {
   tableTiles = Array.from({ length: 16 }, (_, i) => 21 + i);
   resetTurn();
   showScreen('game');
-  setGameplayMode(true); // ← achtergrondanimaties uit
+  setGameplayMode(true);
   renderAll();
   updateAccessibility();
   setTimeout(() => spawnParticles(window.innerWidth/2, window.innerHeight/2, 20, ['#FFD700','#FFA500','#2ecc71','#3498db'], ['🐛','⭐','🎲']), 300);
 }
 
 function resetGame() {
-  setGameplayMode(false); // ← achtergrondanimaties weer aan
+  setGameplayMode(false);
   showScreen('setup');
 }
 
@@ -1521,7 +1505,6 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const el = document.getElementById(id);
   if (el) el.classList.add('active');
-  // Zorg dat animaties alleen uit zijn tijdens actief spel
   if (id === 'setup' || id === 'rules') {
     setGameplayMode(false);
   }
@@ -1533,7 +1516,6 @@ function label(v) { return v === 'W' ? '🐛' : String(v); }
 function turnScore() { return chosenDice.reduce((s, d) => s + (d === 'W' ? 5 : d), 0); }
 function pWorms(p) { return p.tiles.reduce((s, t) => s + wormValue(t), 0); }
 
-/* ========================= TILE CLICK ========================= */
 function clickTile(tileNum, el) {
   if (!tableTiles.includes(tileNum)) return;
   if (el) {
@@ -1549,7 +1531,6 @@ function clickTile(tileNum, el) {
   nextTurn();
 }
 
-/* ========================= ROLL ========================= */
 function doRoll() {
   if (soundEnabled) { rollSound.currentTime = 0; rollSound.play().catch(()=>{}); }
   if (dice.length > 0) return;
@@ -1568,7 +1549,6 @@ function doRoll() {
   setInstruction(`Klik op een dobbelsteen (${remaining} over)`);
 }
 
-/* ========================= LOCK VALUE ========================= */
 function lockValue(value, dieEl) {
   if (locked.includes(value)) return;
   if (!dice.includes(value)) return;
@@ -1598,7 +1578,6 @@ function lockValue(value, dieEl) {
   setInstruction('Gooi opnieuw of stop je beurt');
 }
 
-/* ========================= STOP TURN ========================= */
 function doStop() {
   if (!locked.includes('W')) {
     showOverlay('🐛', 'Geen worm!', 'Je moet minstens één worm hebben.', fail);
@@ -1647,7 +1626,6 @@ function afterTake(msg) {
   }
 }
 
-/* ========================= FAIL ========================= */
 function fail() {
   const p = players[currentPlayer];
   let returned = null;
@@ -1664,7 +1642,6 @@ function fail() {
   else { nextTurn(); }
 }
 
-/* ========================= NEXT TURN ========================= */
 function nextTurn() {
   currentPlayer = (currentPlayer + 1) % players.length;
   resetTurn();
@@ -1672,7 +1649,6 @@ function nextTurn() {
   updateAccessibility();
 }
 
-/* ========================= OVERLAY ========================= */
 let overlayCallback = null;
 function showOverlay(icon, title, text, cb) {
   document.getElementById('mIcon').textContent = icon;
@@ -1687,7 +1663,6 @@ function closeOverlay() {
   if (overlayCallback) { const fn = overlayCallback; overlayCallback = null; fn(); }
 }
 
-/* ========================= RENDER ========================= */
 function renderAll() {
   renderTiles();
   renderDiceArea();
@@ -1785,7 +1760,6 @@ function updateButtons() {
   document.getElementById('btnStop').disabled = !(empty && hasAny);
 }
 
-/* ========================= GAME OVER ========================= */
 function renderGameOver() {
   const ranked = [...players]
     .map(p => ({ name: p.name, worms: pWorms(p), topTile: p.tiles.length ? p.tiles[p.tiles.length - 1] : 0 }))
@@ -1819,7 +1793,6 @@ function renderGameOver() {
   }, 500);
 }
 
-/* ========================= EYE TRACKING ========================= */
 let camera, faceMesh;
 
 function startTracking() {
