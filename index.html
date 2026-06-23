@@ -1741,8 +1741,28 @@ function renderPlayers() {
         ${p.tiles.length > 1 ? `<div class="p-stack">+${p.tiles.length - 1}<br>bedekt</div>` : ''}
       </div>
     `;
+    if (top !== null && i !== currentPlayer) {
+      const tileEl = card.querySelector('.p-tile');
+      tileEl.style.cursor = 'pointer';
+      tileEl.addEventListener('click', () => stealTopTile(i, tileEl));
+      applyDwell(tileEl, () => stealTopTile(i, tileEl));
+    }
     el.appendChild(card);
   });
+}
+
+function stealTopTile(ownerIndex, el) {
+  const owner = players[ownerIndex];
+  if (!owner || owner.tiles.length === 0) return;
+  if (el) {
+    const rect = el.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
+    spawnParticles(cx, cy, 18, ['#FFD700','#FFA500','#fff200','#ff9900'], ['⭐','✨','🐛']);
+  }
+  const stolen = owner.tiles.pop();
+  players[currentPlayer].tiles.push(stolen);
+  nextTurn();
 }
 
 function updateHeader() {
