@@ -1008,6 +1008,18 @@ body.gameplay-active .world-bg > div[style] {
   padding:2.5rem 1rem;
   text-align:center;
 }
+#gameover.screen.active{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  position:fixed;
+  inset:0;
+  z-index:300;
+  background:rgba(0,0,20,0.82);
+  backdrop-filter:blur(6px);
+  overflow-y:auto;
+}
 
 .go-title{
   font-family:'Fredoka One',sans-serif;
@@ -1527,7 +1539,7 @@ function clickTile(tileNum, el) {
   }
   tableTiles = tableTiles.filter(t => t !== tileNum);
   players[currentPlayer].tiles.push(tileNum);
-  if (tableTiles.length === 0) { renderGameOver(); showScreen('gameover'); return; }
+  if (tableTiles.length === 0) { endGame(); return; }
   nextTurn();
 }
 
@@ -1616,11 +1628,17 @@ function doStop() {
   showOverlay('😢', 'Helaas!', 'Geen tegel beschikbaar.', fail);
 }
 
+function endGame() {
+  renderAll();
+  setTimeout(() => {
+    renderGameOver();
+    showScreen('gameover');
+  }, 600);
+}
 function afterTake(msg) {
   spawnParticles(window.innerWidth/2, window.innerHeight/2, 20, ['#FFD700','#FFA500','#2ecc71'], ['⭐','✨','🐛']);
   if (tableTiles.length === 0) {
-    renderGameOver();
-    showOverlay('✅', 'Tegel gepakt!', msg, () => showScreen('gameover'));
+    endGame();
   } else {
     showOverlay('✅', 'Tegel gepakt!', msg, nextTurn);
   }
@@ -1638,7 +1656,7 @@ function fail() {
     const highest = tableTiles[tableTiles.length - 1];
     if (highest !== returned) tableTiles.pop();
   }
-  if (tableTiles.length === 0) { renderGameOver(); showScreen('gameover'); }
+  if (tableTiles.length === 0) { endGame(); }
   else { nextTurn(); }
 }
 
@@ -1782,7 +1800,7 @@ function updateButtons() {
 
 function renderGameOver() {
   const ranked = [...players]
-    .map(p => ({ name: p.name, worms: pWorms(p), topTile: p.tiles.length ? p.tiles[p.tiles.length - 1] : 0 }))
+    .map(p => ({ name: p.name, worms: pWorms(p), tiles: p.tiles.length, topTile: p.tiles.length ? p.tiles[p.tiles.length - 1] : 0 }))
     .sort((a, b) => b.worms - a.worms || b.topTile - a.topTile);
   const list = document.getElementById('rankingList');
   list.innerHTML = '';
@@ -1794,7 +1812,7 @@ function renderGameOver() {
     row.innerHTML = `
       <div class="rank-pos">${['🥇', '🥈', '🥉'][i] || (i + 1) + '.'}</div>
       <div class="rank-name">${p.name}</div>
-      <div class="rank-worms">🐛 ${p.worms}</div>
+      <div class="rank-worms">🐛 ${p.worms}<br><span style="font-size:.65rem;font-weight:700;opacity:.65;">${p.tiles} tegel${p.tiles === 1 ? '' : 's'}</span></div>
     `;
     list.appendChild(row);
   });
